@@ -59,6 +59,33 @@ app.post('/api/v1/tours', (req, res) => {
   // res.send('done');
 });
 
+app.get('/api/v1/tours/:id', (req, res) => {
+  console.log(req.params);
+  const id = req.params.id * 1; // trick in JS :>
+
+  //pseudo solution - over simplistic - in real world we will have
+  //  to check if the users code contain the proper input and if not contain "malwers"
+
+  if (id > tours.length) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
+  }
+
+  //another way around is to check if id is define so
+  //if (!tour) { ... }
+  const tour = tours.find((el) => el.id === id);
+
+  res.status(200).json({
+    status: 'success',
+    //envelope: (enveloping)
+    data: {
+      tour, //ES6 just tours - k and v the same
+    },
+  });
+});
+
 //starting the server
 const port = 3000;
 app.listen(port, () => {
