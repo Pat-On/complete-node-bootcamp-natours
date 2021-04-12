@@ -103,6 +103,20 @@ app.patch('/api/v1/tours/:id', (req, res) => {
   });
 });
 
+app.delete('/api/v1/tours/:id', (req, res) => {
+  if (+req.params.id > tours.length) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
+  }
+  //we are not going to implement it here because it is to much work
+  // we will work on it base on the db
+  res.status(204).json({
+    status: 'success',
+    data: null, //null mean that the data is no longer existing
+  });
+});
 //starting the server
 const port = 3000;
 app.listen(port, () => {
