@@ -86,6 +86,23 @@ app.get('/api/v1/tours/:id', (req, res) => {
   });
 });
 
+app.patch('/api/v1/tours/:id', (req, res) => {
+  if (+req.params.id > tours.length) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
+  }
+  //we are not going to implement it here because it is to much work
+  // we will work on it base on the db
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour: '<Updated Tour here...>',
+    },
+  });
+});
+
 //starting the server
 const port = 3000;
 app.listen(port, () => {
