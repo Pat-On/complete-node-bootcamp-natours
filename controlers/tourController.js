@@ -18,8 +18,6 @@ exports.checkID = (req, res, next) => {
 };
 
 exports.checkBody = (req, res, next) => {
-  console.log(req.body.name);
-  console.log('???');
   if (!req.body.name || !req.body.price) {
     return res.status(400).json({
       status: 'fail',
@@ -28,16 +26,6 @@ exports.checkBody = (req, res, next) => {
   }
   next();
 };
-
-// exports.checkBody = (req, res, next) => {
-//   if (!req.body.name || !req.body.price) {
-//     return res.status(400).json({
-//       status: 'fail',
-//       message: 'Missing name or price',
-//     });
-//   }
-//   next();
-// };
 
 exports.getAllTours = (req, res) => {
   console.log(req.requestTime);
@@ -52,8 +40,6 @@ exports.getAllTours = (req, res) => {
   });
 };
 exports.createTour = (req, res) => {
-  // console.log(req);
-  // console.log(req.body);
   const newId = tours[tours.length - 1].id + 1;
   const newTour = Object.assign({ id: newId }, req.body);
 
@@ -73,15 +59,7 @@ exports.createTour = (req, res) => {
 };
 
 exports.getTour = (req, res) => {
-  //   console.log(req.params);
   const id = req.params.id * 1; // trick in JS :>
-
-  //   if (id > tours.length) {
-  //     return res.status(404).json({
-  //       status: 'fail',
-  //       message: 'Invalid ID',
-  //     });
-  //   }
 
   const tour = tours.find((el) => el.id === id);
 
@@ -95,12 +73,6 @@ exports.getTour = (req, res) => {
 };
 
 exports.updateTour = (req, res) => {
-  //   if (+req.params.id > tours.length) {
-  //     return res.status(404).json({
-  //       status: 'fail',
-  //       message: 'Invalid ID',
-  //     });
-  //   }
   //we are not going to implement it here because it is to much work
   // we will work on it base on the db
   res.status(200).json({
