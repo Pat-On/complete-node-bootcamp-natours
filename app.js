@@ -5,11 +5,26 @@ const app = express();
 
 app.use(express.json()); // <-it really work nice!
 
+//our own middleware
+app.use((req, res, next) => {
+  //by adding next express know that we are creating here the middleware
+  //next is the function - name is convention
+  console.log('Hello from the middleware');
+  next(); // if we are not going to add it the req would stuck here
+});
+
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+
+  next();
+});
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 
 const getAllTours = (req, res) => {
+  console.log(req.requestTime);
+
   res.status(200).json({
     status: 'success',
 
