@@ -5,7 +5,7 @@ const tours = JSON.parse(
 );
 
 //to check id middleware
-exports.checkID = (req, res, next) => {
+exports.checkID = (req, res, next, val) => {
   console.log(`tour id is: ${val}`);
   console.log(req.params.id);
   if (req.params.id * 1 > tours.length - 1) {
