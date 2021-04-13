@@ -17,6 +17,8 @@ app.use((req, res, next) => {
   next(); // if we are not going to add it the req would stuck here
 });
 
+console.log(121 % 10);
+
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
 
