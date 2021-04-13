@@ -4,6 +4,19 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
 
+//to check id middleware
+exports.checkID = (req, res, next, val) => {
+  console.log(`tour id is: ${val}`);
+  console.log(req.params.id);
+  if (req.params.id * 1 > tours.length - 1) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
+  }
+  next();
+};
+
 exports.getAllTours = (req, res) => {
   console.log(req.requestTime);
 
@@ -38,15 +51,15 @@ exports.createTour = (req, res) => {
 };
 
 exports.getTour = (req, res) => {
-  console.log(req.params);
+  //   console.log(req.params);
   const id = req.params.id * 1; // trick in JS :>
 
-  if (id > tours.length) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-  }
+  //   if (id > tours.length) {
+  //     return res.status(404).json({
+  //       status: 'fail',
+  //       message: 'Invalid ID',
+  //     });
+  //   }
 
   const tour = tours.find((el) => el.id === id);
 
@@ -60,12 +73,12 @@ exports.getTour = (req, res) => {
 };
 
 exports.updateTour = (req, res) => {
-  if (+req.params.id > tours.length) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-  }
+  //   if (+req.params.id > tours.length) {
+  //     return res.status(404).json({
+  //       status: 'fail',
+  //       message: 'Invalid ID',
+  //     });
+  //   }
   //we are not going to implement it here because it is to much work
   // we will work on it base on the db
   res.status(200).json({
@@ -77,13 +90,6 @@ exports.updateTour = (req, res) => {
 };
 
 exports.deleteTour = (req, res) => {
-  if (+req.params.id > tours.length) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-  }
-
   res.status(204).json({
     status: 'success',
     data: null, //null mean that the data is no longer existing
