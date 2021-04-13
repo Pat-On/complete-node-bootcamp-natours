@@ -5,7 +5,7 @@ const tours = JSON.parse(
 );
 
 //to check id middleware
-exports.checkID = (req, res, next, val) => {
+exports.checkID = (req, res, next) => {
   console.log(`tour id is: ${val}`);
   console.log(req.params.id);
   if (req.params.id * 1 > tours.length - 1) {
@@ -16,6 +16,28 @@ exports.checkID = (req, res, next, val) => {
   }
   next();
 };
+
+exports.checkBody = (req, res, next) => {
+  console.log(req.body.name);
+  console.log('???');
+  if (!req.body.name || !req.body.price) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'Not containing all required data',
+    });
+  }
+  next();
+};
+
+// exports.checkBody = (req, res, next) => {
+//   if (!req.body.name || !req.body.price) {
+//     return res.status(400).json({
+//       status: 'fail',
+//       message: 'Missing name or price',
+//     });
+//   }
+//   next();
+// };
 
 exports.getAllTours = (req, res) => {
   console.log(req.requestTime);
