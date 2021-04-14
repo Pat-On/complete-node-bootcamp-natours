@@ -48,6 +48,22 @@ const tourSchema = new mongoose.Schema({
 // convention to use capital in that case
 const Tour = mongoose.model('Tour', tourSchema);
 
+//it is analogically similar to new instance in classes
+const testTour = new Tour({
+  name: 'The Park Camper',
+  rating: 4.5,
+  price: 997,
+});
+//saving to the database
+testTour
+  .save()
+  .then((doc) => {
+    console.log(doc); //final document from DB
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`App running on port ${port}...`);
