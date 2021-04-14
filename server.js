@@ -25,45 +25,6 @@ mongoose
     console.log('DB connection successful!');
   });
 
-//---------------------- mongoose ---------------------------
-const tourSchema = new mongoose.Schema({
-  //native for js types of data
-  // name: String,
-  name: {
-    type: String,
-    required: [true, 'A tour must have a name'], // <-proper name of it is validator <nice>
-    unique: true, // base on this we can not have two the same name of the trip
-  },
-  rating: {
-    type: Number,
-    default: 4.5, // default value if not specify
-  },
-  // price: Number,
-  price: {
-    type: Number,
-    required: [true, 'A tour must have a price'],
-  },
-});
-
-// convention to use capital in that case
-const Tour = mongoose.model('Tour', tourSchema);
-
-//it is analogically similar to new instance in classes
-const testTour = new Tour({
-  name: 'The Park Camper',
-  rating: 4.5,
-  price: 997,
-});
-//saving to the database
-testTour
-  .save()
-  .then((doc) => {
-    console.log(doc); //final document from DB
-  })
-  .catch((err) => {
-    console.log(err);
-  });
-
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`App running on port ${port}...`);

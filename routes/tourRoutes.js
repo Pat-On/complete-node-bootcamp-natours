@@ -5,7 +5,7 @@ const router = express.Router();
 // router.use(express.json());
 //param middleware
 //when it is called here, it would pass the id to function so the id is going to be defined
-router.param('id', tourController.checkID);
+// router.param('id', tourController.checkID);
 
 router
   .route('/')
