@@ -1,7 +1,8 @@
 const express = require('express');
-const tourController = require('./../controlers/tourController');
+const tourController = require('../controlers/tourController');
 
 const router = express.Router();
+
 // router.use(express.json());
 //param middleware
 //when it is called here, it would pass the id to function so the id is going to be defined
@@ -10,7 +11,7 @@ const router = express.Router();
 router
   .route('/')
   .get(tourController.getAllTours)
-  .post(tourController.checkBody, tourController.createTour);
+  .post(tourController.createTour);
 
 router
   .route('/:id')

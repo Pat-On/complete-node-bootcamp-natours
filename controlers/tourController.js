@@ -1,33 +1,6 @@
 // const fs = require('fs');
 const Tour = require('../model/tourModel');
 
-// const tours = JSON.parse(
-//   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
-// );
-
-//to check id middleware - mongo is giving us this functionality
-// exports.checkID = (req, res, next, val) => {
-//   console.log(`tour id is: ${val}`);
-//   console.log(req.params.id);
-//   // if (req.params.id * 1 > tours.length - 1) {
-//   //   return res.status(404).json({
-//   //     status: 'fail',
-//   //     message: 'Invalid ID',
-//   //   });
-//   // }
-//   next();
-// };
-
-exports.checkBody = (req, res, next) => {
-  if (!req.body.name || !req.body.price) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'Not containing all required data',
-    });
-  }
-  next();
-};
-
 exports.getAllTours = (req, res) => {
   console.log(req.requestTime);
 
@@ -40,20 +13,31 @@ exports.getAllTours = (req, res) => {
     // },
   });
 };
-exports.createTour = (req, res) => {
-  // res.status(201).json({
-  //   status: 'success',
-  //   data: {
-  //     tour: newTour,
-  //   },
-  // });
+exports.createTour = async (req, res) => {
+  try {
+    // const newTours = new Tour({})
+    // newTours.save
+
+    //we call create function on the model itself - create return promise
+    const newTour = await Tour.create(req.body);
+
+    res.status(201).json({
+      status: 'success',
+      data: {
+        tour: newTour,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: 'Invalid data sent!',
+    });
+  }
 };
 
 exports.getTour = (req, res) => {
-  const id = req.params.id * 1; // trick in JS :>
-
+  // const id = req.params.id * 1; // trick in JS :>
   // const tour = tours.find((el) => el.id === id);
-
   // res.status(200).json({
   //   status: 'success',
   //   //envelope: (enveloping)
