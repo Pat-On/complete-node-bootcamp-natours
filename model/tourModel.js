@@ -53,6 +53,7 @@ const tourSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now(), //time stamp with a milliseconds in mong it is automatically converted to data
+    select: false, //hiding it from the users eyes
   },
   startDates: [Date],
   //"2021-03-21" -> and mongo would pass it automatically to date

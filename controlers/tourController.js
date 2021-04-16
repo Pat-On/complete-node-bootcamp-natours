@@ -45,7 +45,7 @@ exports.getAllTours = async (req, res) => {
     // const tours = await Tour.find();
     // console.log(req.query, queryObj);
 
-    const query = Tour.find(JSON.parse(queryString));
+    let query = Tour.find(JSON.parse(queryString));
 
     // console.log(query);
     //mongoose methods
@@ -54,6 +54,25 @@ exports.getAllTours = async (req, res) => {
     //   .equals(5)
     //   .where('difficulty')
     //   .equals('easy');
+    //  SORTING!!!!!
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      //right we did not delete it from this object
+      query = query.sort(sortBy); // so basically we are adding it to mongoose query object
+      //sort('price ratingAverage') -> second is going to be use in case of  the same values
+    } else {
+      //default sort
+      query = query.sort('-createdAt');
+    }
+
+    //FIELD LIMITING !!!!!!!!!!!!!!!!!!!!!!
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      // query.select("name duration price") <- they call it projecting
+      query = query.select(fields);
+    } else {
+      query = query.select('-__v');
+    }
 
     // EXECUTE QUERY
     const tours = await query;
