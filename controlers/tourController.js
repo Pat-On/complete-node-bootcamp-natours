@@ -22,6 +22,9 @@ exports.getTour = async (req, res) => {
 
 exports.getAllTours = async (req, res) => {
   try {
+    //BUILDING QUERY
+
+    //we are kicking out the things what we do not want to query from DB
     const queryObj = { ...req.query };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((el) => delete queryObj[el]);
@@ -29,8 +32,8 @@ exports.getAllTours = async (req, res) => {
     // const tours = await Tour.find();
     console.log(req.query, queryObj);
 
-    const tours = await Tour.find(req.query);
-
+    const query = Tour.find(queryObj);
+    console.log(query);
     //mongoose methods
     // const tours = await Tour.find()
     //   .where('duration')
@@ -38,8 +41,10 @@ exports.getAllTours = async (req, res) => {
     //   .where('difficulty')
     //   .equals('easy');
 
-    // console.log(req.requestTime);
+    // EXECUTE QUERY
+    const tours = await query;
 
+    //SEND RESPONSE
     res.status(200).json({
       status: 'success',
 
