@@ -1,18 +1,29 @@
 // const fs = require('fs');
 const Tour = require('../model/tourModel');
 
-exports.getAllTours = (req, res) => {
-  console.log(req.requestTime);
+exports.getAllTours = async (req, res) => {
+  try {
+    //.find() -> is doing basicaly everything for us - BSON/JSON to the js objects
+    const tours = await Tour.find();
 
-  res.status(200).json({
-    status: 'success',
+    // console.log(req.requestTime);
 
-    // results: tours.length, // it is not exactly from specification but it is useful for front app to do it
-    // data: {
-    //   tours: tours, //ES6 just tours - k and v the same
-    // },
-  });
+    res.status(200).json({
+      status: 'success',
+
+      results: tours.length, // it is not exactly from specification but it is useful for front app to do it
+      data: {
+        tours: tours, //ES6 just tours - k and v the same
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
 };
+
 exports.createTour = async (req, res) => {
   try {
     // const newTours = new Tour({})
@@ -35,16 +46,22 @@ exports.createTour = async (req, res) => {
   }
 };
 
-exports.getTour = (req, res) => {
-  // const id = req.params.id * 1; // trick in JS :>
-  // const tour = tours.find((el) => el.id === id);
-  // res.status(200).json({
-  //   status: 'success',
-  //   //envelope: (enveloping)
-  //   data: {
-  //     tour, //ES6 just tours - k and v the same
-  //   },
-  // });
+exports.getTour = async (req, res) => {
+  try {
+    const tour = await Tour.findById(req.params.id);
+
+    res.status(201).json({
+      status: 'success',
+      data: {
+        tour,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: 'Invalid data sent!',
+    });
+  }
 };
 
 exports.updateTour = (req, res) => {
