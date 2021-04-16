@@ -22,8 +22,21 @@ exports.getTour = async (req, res) => {
 
 exports.getAllTours = async (req, res) => {
   try {
+    const queryObj = { ...req.query };
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    excludedFields.forEach((el) => delete queryObj[el]);
     //.find() -> is doing basicaly everything for us - BSON/JSON to the js objects
-    const tours = await Tour.find();
+    // const tours = await Tour.find();
+    console.log(req.query, queryObj);
+
+    const tours = await Tour.find(req.query);
+
+    //mongoose methods
+    // const tours = await Tour.find()
+    //   .where('duration')
+    //   .equals(5)
+    //   .where('difficulty')
+    //   .equals('easy');
 
     // console.log(req.requestTime);
 
