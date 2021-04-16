@@ -22,6 +22,7 @@ exports.getTour = async (req, res) => {
 
 exports.getAllTours = async (req, res) => {
   try {
+    // !IMPORTANT in that case we would have to do documentation, to teach user how to use it
     //BUILDING QUERY
     //1 ) filtering
     //we are kicking out the things what we do not want to query from DB
