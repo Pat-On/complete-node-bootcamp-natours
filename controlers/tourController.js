@@ -23,17 +23,30 @@ exports.getTour = async (req, res) => {
 exports.getAllTours = async (req, res) => {
   try {
     //BUILDING QUERY
-
+    //1 ) filtering
     //we are kicking out the things what we do not want to query from DB
     const queryObj = { ...req.query };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((el) => delete queryObj[el]);
     //.find() -> is doing basicaly everything for us - BSON/JSON to the js objects
-    // const tours = await Tour.find();
-    console.log(req.query, queryObj);
 
-    const query = Tour.find(queryObj);
-    console.log(query);
+    //2) Advanced filtering
+    let queryString = JSON.stringify(queryObj);
+    queryString = queryString.replace(
+      /\b(gte|gt|lte|lt)\b/g,
+      (match) => `$${match}`
+    );
+    // console.log(JSON.parse(queryString));
+    // {difficulty: 'easy', duration: { $gte: 5}} <- manual writing for query in mongoose
+    //{ difficulty: { gte: 'easy' }, page: '5' }
+    //to replace gre, gt, lte, lt
+
+    // const tours = await Tour.find();
+    // console.log(req.query, queryObj);
+
+    const query = Tour.find(JSON.parse(queryString));
+
+    // console.log(query);
     //mongoose methods
     // const tours = await Tour.find()
     //   .where('duration')
