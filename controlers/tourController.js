@@ -1,6 +1,25 @@
 // const fs = require('fs');
 const Tour = require('../model/tourModel');
 
+exports.getTour = async (req, res) => {
+  try {
+    const tour = await Tour.findById(req.params.id);
+    //Tour.findOne({_id: req.params.id})- normal solution
+
+    res.status(201).json({
+      status: 'success',
+      data: {
+        tour,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: 'Invalid data sent!',
+    });
+  }
+};
+
 exports.getAllTours = async (req, res) => {
   try {
     //.find() -> is doing basicaly everything for us - BSON/JSON to the js objects
@@ -46,11 +65,15 @@ exports.createTour = async (req, res) => {
   }
 };
 
-exports.getTour = async (req, res) => {
+exports.updateTour = async (req, res) => {
   try {
-    const tour = await Tour.findById(req.params.id);
-
-    res.status(201).json({
+    // we are going to update the item by id - logical
+    const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+      // options
+      new: true, // new updated document would be returned to client
+      runValidators: true, // we are going to trigger check again - validator base on the model's schema nice!
+    });
+    res.status(200).json({
       status: 'success',
       data: {
         tour,
@@ -62,17 +85,6 @@ exports.getTour = async (req, res) => {
       message: 'Invalid data sent!',
     });
   }
-};
-
-exports.updateTour = (req, res) => {
-  //we are not going to implement it here because it is to much work
-  // we will work on it base on the db
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour: '<Updated Tour here...>',
-    },
-  });
 };
 
 exports.deleteTour = (req, res) => {
