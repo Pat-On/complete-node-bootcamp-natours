@@ -119,3 +119,49 @@ exports.deleteTour = async (req, res) => {
     });
   }
 };
+
+//aggregation-pipeline
+exports.getTourStats = async (req, res) => {
+  try {
+    // it is like normal query but we can do manipulate data in  couple of steps
+
+    const stats = await Tour.aggregate([
+      //each of the stages is the object
+      {
+        //it is like query
+        $match: { ratingsAverage: { $gte: 4.5 } },
+      },
+      {
+        $group: {
+          //here real magic is happen -> we are going to use accumulator
+          //we can calculate here for example rating
+          // _id: null,
+          // _id: '$difficulty',
+          _id: { $toUpper: '$difficulty' },
+          numTours: { $sum: 1 },
+          numRatings: { $sum: '$ratingsQuantity' },
+          avgRating: { $avg: '$ratingsAverage' },
+          avgPrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' },
+        },
+      },
+      {
+        $sort: { avgPrice: -1 },
+      },
+      // {
+      //   $match: { _id: { $ne: 'EASY' } },
+      // },
+    ]);
+
+    res.status(200).json({
+      status: 'success',
+      data: stats, //null mean that the data is no longer existing
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
