@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const slugify = require('slugify');
+const validator = require('validator');
 
 //---------------------- mongoose ---------------------------
 const tourSchema = new mongoose.Schema(
@@ -14,6 +15,7 @@ const tourSchema = new mongoose.Schema(
       trim: true,
       maxlength: [40, 'A tour name must have less or equal then 40 characters'],
       minlength: [10, 'A tour must have more than 10 characters'],
+      // validate: [validator.isAlpha, 'Tour name must only contain characters'], //validator imported from the validator import
     },
     slug: String,
     duration: {
@@ -48,7 +50,18 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'A tour must have a price'],
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      //val - coming from output
+      validate: {
+        validator: function (val) {
+          //this only point to current document on NEW document creation
+          return val < this.price;
+        },
+        //({VALUE}) - this syntax is coming from the Mongo.DB
+        message: 'Discount price ({VALUE}) should be below regular price',
+      },
+    },
     summary: {
       type: String,
       trim: true, // only work for strings ->  different schema types different config
