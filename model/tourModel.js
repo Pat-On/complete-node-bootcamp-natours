@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const slugify = require('slugify');
+
 //---------------------- mongoose ---------------------------
 const tourSchema = new mongoose.Schema(
   {
@@ -11,6 +13,7 @@ const tourSchema = new mongoose.Schema(
       unique: true, // base on this we can not have two the same name of the trip
       trim: true,
     },
+    slug: String,
     duration: {
       type: Number,
       required: [true, 'A tour must have a duration'],
@@ -69,9 +72,21 @@ const tourSchema = new mongoose.Schema(
 
 tourSchema.virtual('durationWeeks').get(function () {
   //we used regular function because arrow function is not getting its own
-  //this key word
+  //this key word - we can not use them in query because they are not part of data base
+
   return this.durration / 7;
 });
+// DOCUMENT MIDDLEWARE: runs before .save() and .create() but .inserMany() is not going trigger it
+tourSchema.pre('save', function (next) {
+  // console.log(this); //this is going to be our document
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
+//after saving document to DB - last middleware after all changes
+// tourSchema.post('save', function (doc, next) {
+//   console.log(doc);
+//   next();
+// });
 
 // convention to use capital in that case - model declaration
 const Tour = mongoose.model('Tour', tourSchema);
