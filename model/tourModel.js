@@ -60,6 +60,10 @@ const tourSchema = new mongoose.Schema(
       select: false, //hiding it from the users eyes
     },
     startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
     //"2021-03-21" -> and mongo would pass it automatically to date
     //if it is can not parse it, t would then it would throw error
   },
@@ -87,6 +91,24 @@ tourSchema.pre('save', function (next) {
 //   console.log(doc);
 //   next();
 // });
+
+//QUERY MIDDLEWARE
+//this regular expresion is going to trigger always when happen event starting with find wow
+tourSchema.pre(/^find/, function (next) {
+  // tourSchema.pre('find', function (next) {
+  //this keq word is the query object mongoDB
+  this.find({ secretTour: { $ne: true } });
+  this.start = Date.now();
+  next();
+});
+
+//run after query was executed so we have access to the docs
+tourSchema.post(/^find/, function (docs, next) {
+  console.log(`query took: ${Date.now() - this.start} milliseconds`);
+  console.log(docs);
+
+  next();
+});
 
 // convention to use capital in that case - model declaration
 const Tour = mongoose.model('Tour', tourSchema);
