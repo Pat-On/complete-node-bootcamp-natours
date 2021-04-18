@@ -1,6 +1,9 @@
 const express = require('express');
 const morgan = require('morgan');
 
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controlers/errorController');
+
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 
@@ -34,23 +37,13 @@ app.all('*', (req, res, next) => {
   // });
 
   //defining the error object with statuses
-  const err = new Error(`Can't find ${req.originalUrl}`);
-  err.status = 'fail';
-  err.statusCode = 404;
+  // const err = new Error(`Can't find ${req.originalUrl}`);
+  // err.status = 'fail';
+  // err.statusCode = 404;
 
-  next(err);
+  next(new AppError(`Can't find ${req.originalUrl}`, 404));
 });
 
-app.use((err, req, res, next) => {
-  //we are going to give default srtatus code because we may have error
-  err.statusCode = err.statusCode || 500;
-  //the same like above
-  err.status = err.status || 'error';
-  //we are going to read the error from the error object
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-  });
-});
+app.use(globalErrorHandler);
 
 module.exports = app;
