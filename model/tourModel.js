@@ -12,6 +12,8 @@ const tourSchema = new mongoose.Schema(
       required: [true, 'A tour must have a name'], // <-proper name of it is validator <nice>
       unique: true, // base on this we can not have two the same name of the trip
       trim: true,
+      maxlength: [40, 'A tour name must have less or equal then 40 characters'],
+      minlength: [10, 'A tour must have more than 10 characters'],
     },
     slug: String,
     duration: {
@@ -25,10 +27,17 @@ const tourSchema = new mongoose.Schema(
     difficulty: {
       type: String,
       required: [true, 'A tour must have a difficulty'],
+      enum: {
+        values: ['easy', 'medium', 'difficult'],
+        message: 'Difficult is either: easy, medium or difficult',
+      },
     },
     ratingsAverage: {
       type: Number,
       default: 4.5, // default value if not specify
+      //min max work with dates too
+      min: [1, 'Rating must be more than 1'],
+      max: [5, 'Rating must be less than 5'],
     },
     ratingsQuantity: {
       type: Number,
@@ -103,18 +112,18 @@ tourSchema.pre(/^find/, function (next) {
 });
 
 //run after query was executed so we have access to the docs
-tourSchema.post(/^find/, function (docs, next) {
-  console.log(`query took: ${Date.now() - this.start} milliseconds`);
-  console.log(docs);
+// tourSchema.post(/^find/, function (docs, next) {
+// console.log(`query took: ${Date.now() - this.start} milliseconds`);
+// console.log(docs);
 
-  next();
-});
+// next();
+// });
 
 //AGGREGATION MIDDLEWARE
 tourSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
 
-  console.log(this.pipeline());
+  // console.log(this.pipeline());
   next();
 });
 
