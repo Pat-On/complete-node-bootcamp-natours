@@ -110,6 +110,14 @@ tourSchema.post(/^find/, function (docs, next) {
   next();
 });
 
+//AGGREGATION MIDDLEWARE
+tourSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+
+  console.log(this.pipeline());
+  next();
+});
+
 // convention to use capital in that case - model declaration
 const Tour = mongoose.model('Tour', tourSchema);
 
