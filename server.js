@@ -2,6 +2,13 @@ const mongoose = require('mongoose');
 
 const dotenv = require('dotenv');
 
+process.on('uncaughtException', (err) => {
+  console.log('UNCAUGHT EXCEPTION! SHUTTING DOWN...');
+  console.log(err.name, err.message);
+
+  process.exit(1); //We need to close the up because the node is in not clear state
+});
+
 //it only need to happen once and then process has all variables accessible from every single file in proj
 dotenv.config({ path: './config.env' });
 const app = require('./app');
