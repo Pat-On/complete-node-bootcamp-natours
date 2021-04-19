@@ -17,6 +17,13 @@ const handleDuplicateFieldsDB = (err) => {
   // const message = `Duplicate field value: {} Please use another value!`;
 };
 
+const handleValidationErrorDB = (err) => {
+  console.log('Did You get here?');
+  const errors = Object.values(err.errors).map((item) => item.message);
+  const message = `Invalid input data. ${errors.join('. ')}`;
+  return new AppError(message, 400);
+};
+
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -43,6 +50,7 @@ const sendErrorProduction = (err, res) => {
     res.status(500).json({
       status: 'error',
       message: 'Something went wrong',
+      err: err,
     });
   }
 };
@@ -60,12 +68,20 @@ module.exports = (err, req, res, next) => {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
-    console.log(error.code);
-    if (err.name === 'CastError') {
+    console.log(err.stack);
+
+    //targeting the operational error which are coming from imported modules
+    if (error.name === 'CastError') {
       error = handleCastErrorDB(error);
     }
-    // IMPORTANT
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
+    //another change in the mongo error object - no longer error.name
+    if (error._message === 'Tour validation failed')
+      error = handleValidationErrorDB(error);
+
+    //interesting approach based on error stack
+    // if (err.stack.substr(0, 15) === 'ValidationError')
+    //   error = handleValidationErrorDB(error);
 
     sendErrorProduction(error, res);
   }
