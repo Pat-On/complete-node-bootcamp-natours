@@ -22,6 +22,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide a password'],
     minlength: 8, // this is minimum length of password
+    // it will never show up in any output !IMPORTANT
+    select: false,
   },
   passwordConfirm: {
     type: String,
@@ -48,6 +50,15 @@ userSchema.pre('save', async function (next) {
   this.passwordConfirm = undefined; //deleting the password from schema ... model which is going to DB
   next(); // haha I forgot about it
 });
+
+// INSTANCE METHOD it is going to available on all models of certain collections
+userSchema.methods.correctPassword = async function (
+  candidatePassword, //not hashed
+  userPassword //hashed
+) {
+  //this key word is not working because in output password is not available
+  return await bcrypt.compare(candidatePassword, userPassword); //true if the same, false if not
+};
 
 // MODEL
 const User = mongoose.model('User', userSchema);

@@ -7,6 +7,7 @@ const router = express.Router();
 // like authorization, that is why we are going to have special routes
 // signup - is like special case so it is not suitable to other endpoints - divide by philosophy :>
 router.post('/signup', authController.signup); // in that case we are going to have route that is only send
+router.post('/login', authController.login);
 
 router
   .route('')
