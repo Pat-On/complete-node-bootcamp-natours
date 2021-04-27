@@ -1,5 +1,6 @@
 const express = require('express');
 const tourController = require('../controlers/tourController');
+const authController = require('../controlers/authController');
 
 const router = express.Router();
 
@@ -17,7 +18,8 @@ router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
 
 router
   .route('/')
-  .get(tourController.getAllTours)
+  // this authController.protect - is going actively protect not log in users to get access to it
+  .get(authController.protect, tourController.getAllTours)
   .post(tourController.createTour);
 
 router
