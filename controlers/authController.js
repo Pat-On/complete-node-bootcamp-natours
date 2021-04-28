@@ -27,6 +27,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
+    passwordChangedAt: req.body.passwordConfirm,
   });
 
   const token = signToken(newUser._id);
@@ -99,16 +100,32 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   //2) Verification token -jwt is checking if token in proper
+  // verification process if nt successful will throw error :> altering etc
+  // MOST important PART
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   // console.log(decoded);
   // console.log('Did you get here?');
 
   //3)  check if user still exists
   const freshUser = await User.findById(decoded.id);
-
+  if (!freshUser) {
+    return next(
+      new AppError(
+        'The user belonging to this token does no longer exist.',
+        401
+      )
+    );
+  }
   //4) check if user changes password (token) after the JWT was issued
+  //documents are instances of the model
+  if (freshUser.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError('User recently changed password! Please log in again!', 401)
+    );
+  }
 
   // only if all test are going to be passed the next(); is going to be called
   // and middleware is going to bring us to the "route"
-  next();
+  req.user = freshUser;
+  next(); //grant access to protected route
 });
