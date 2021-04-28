@@ -152,16 +152,11 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   if (!user) {
     return next(new AppError('there is no user with that email address', 404));
   }
-  // 2) Generate the random reset toke - once more user data instance!
+  // 2) Generate the random reset toke - once more user method!  instance!
   const resetToken = user.createPasswordResetToken();
   // await user.save(); // in this way it would give to use error because not all fields are provided
   await user.save({ validateBeforeSave: false });
   // 3 send it to user's email
-
-  //reset url
-  // const resetURL = `${req.protocol}://${req.get(
-  //   'host'
-  // )}/api/v1/users/resetPassword/${resetToken}`;
 
   const resetURL = `${req.protocol}://${req.get(
     'host'
