@@ -60,6 +60,16 @@ userSchema.pre('save', async function (next) {
   next(); // haha I forgot about it
 });
 
+userSchema.pre('save', function (next) {
+  //before new document is going to be saved
+  if (!this.isModified('password') || this.isNew) return next(); //mongoose -> read documentation! It is crucial
+
+  this.passwordChangedAt = Date.now() - 1000; // subtraction, because of the difference when is created the token and when was saved in DB
+  // by this we are not going to have "error?" where time stamp is different on token and different in DB
+  //always created after password was changed
+  next();
+});
+
 // INSTANCE METHOD it is going to available on all models of certain collections
 userSchema.methods.correctPassword = async function (
   candidatePassword, //not hashed
