@@ -45,6 +45,11 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date, //security measure like 10 minutes to do it
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 
 //middleware function which is going to encrypted data between getting data and saving it to DB
@@ -67,6 +72,12 @@ userSchema.pre('save', function (next) {
   this.passwordChangedAt = Date.now() - 1000; // subtraction, because of the difference when is created the token and when was saved in DB
   // by this we are not going to have "error?" where time stamp is different on token and different in DB
   //always created after password was changed
+  next();
+});
+// middleware
+userSchema.pre(/^find/, function (next) {
+  // this points to the current query -> so it is going to edit the query object
+  this.find({ active: { $ne: false } });
   next();
 });
 
