@@ -107,8 +107,8 @@ exports.protect = catchAsync(async (req, res, next) => {
   // console.log('Did you get here?');
 
   //3)  check if user still exists
-  const freshUser = await User.findById(decoded.id);
-  if (!freshUser) {
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
     return next(
       new AppError(
         'The user belonging to this token does no longer exist.',
@@ -118,7 +118,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
   //4) check if user changes password (token) after the JWT was issued
   //documents are instances of the model
-  if (freshUser.changedPasswordAfter(decoded.iat)) {
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
     return next(
       new AppError('User recently changed password! Please log in again!', 401)
     );
@@ -126,6 +126,6 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // only if all test are going to be passed the next(); is going to be called
   // and middleware is going to bring us to the "route"
-  req.user = freshUser;
+  req.user = currentUser;
   next(); //grant access to protected route
 });
