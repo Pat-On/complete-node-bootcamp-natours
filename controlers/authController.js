@@ -144,3 +144,18 @@ exports.restrictTo = (...roles) => (req, _res, next) => {
   }
   next();
 };
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  // 1) Get user based on POSTed email
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    return next(new AppError('there is no user with that email address', 404));
+  }
+  // 2) Generate the random reset toke - once more user data instance!
+  const resetToken = user.createPasswordResetToken();
+  // await user.save(); // in this way it would give to use error because not all fields are provided
+  await user.save({ validateBeforeSave: false });
+  // 3 send it to user's email
+});
+
+exports.resetPassword = (req, res, next) => {};

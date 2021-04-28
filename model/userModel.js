@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
@@ -42,6 +43,8 @@ const userSchema = new mongoose.Schema({
     },
   },
   passwordChangedAt: Date,
+  passwordResetToken: String,
+  passwordResetExpires: Date, //security measure like 10 minutes to do it
 });
 
 //middleware function which is going to encrypted data between getting data and saving it to DB
@@ -82,6 +85,20 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   //False mean not changed
 
   return false;
+};
+
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString('hex'); // it is like reset password!
+
+  // we need to encrypt it like password because may be stolen and used by hacker
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+  console.log({ resetToken }, this.passwordResetToken);
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken; //via email we are sending not encrypted version but in DB we store encrypted one!
 };
 
 // MODEL
