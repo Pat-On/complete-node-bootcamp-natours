@@ -28,6 +28,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     passwordChangedAt: req.body.passwordConfirm,
+    role: req.body.role,
   });
 
   const token = signToken(newUser._id);
@@ -118,6 +119,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
   //4) check if user changes password (token) after the JWT was issued
   //documents are instances of the model
+  console.log(decoded);
   if (currentUser.changedPasswordAfter(decoded.iat)) {
     return next(
       new AppError('User recently changed password! Please log in again!', 401)
@@ -129,3 +131,16 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = currentUser;
   next(); //grant access to protected route
 });
+
+// how to pass the arguments to middleware! by wrapper function which is going to return the middleware
+exports.restrictTo = (...roles) => (req, _res, next) => {
+  // roles is array - es6 syntax
+
+  // req.user.role -> coming from middleware before one
+  if (!roles.includes(req.user.role)) {
+    return next(
+      new AppError('You do not have permission to perform this action', 403) //403 - forbidden
+    );
+  }
+  next();
+};
