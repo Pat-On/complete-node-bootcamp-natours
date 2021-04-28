@@ -13,6 +13,19 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user.id);
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      //envelope
+      user: user,
+    },
+  });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   //!IMPORTANT
   //in this way how it is done above you can register your user as a admin what is wrong!
@@ -33,7 +46,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     role: req.body.role,
   });
 
-  const token = signToken(newUser._id);
+  // const token = signToken(newUser._id);
 
   // const token = jwt.sign(
   //   {
@@ -44,16 +57,18 @@ exports.signup = catchAsync(async (req, res, next) => {
   //   { expiresIn: process.env.JWT_EXPIRES_IN } // expiration time
   // );
 
-  console.log(newUser);
-  // here we are not going to check anything because the user is created and we are going to send the token
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      //envelope
-      user: newUser,
-    },
-  });
+  createSendToken(newUser, 201, res);
+
+  // console.log(newUser);
+  // // here we are not going to check anything because the user is created and we are going to send the token
+  // res.status(201).json({
+  //   status: 'success',
+  //   token,
+  //   data: {
+  //     //envelope
+  //     user: newUser,
+  //   },
+  // });
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -77,11 +92,14 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   //3) If everything ok, send token to client
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+
+  createSendToken(user, 200, res);
+
+  // const token = signToken(user._id);
+  // res.status(200).json({
+  //   status: 'success',
+  //   token,
+  // });
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -224,10 +242,34 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   //3;  update changedPasswordAt property for the user
 
   //4 log the user in, send JWT
-  const token = signToken(user._id);
 
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user, 200, res);
+
+  // const token = signToken(user._id);
+
+  // res.status(200).json({
+  //   status: 'success',
+  //   token,
+  // });
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  //this functionality we are going to only allow for authorized us4ers but as well we are going to
+  //force user to put password again - security measures
+  // 1) Get user from collection
+  const user = await User.findById(req.user.id).select('+password');
+  // 2) check if POSTed current password is correct
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError('Your current password is wrong.', 401));
+  }
+  // 3) if so, update password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save(); // we want validation to happen
+  // 4) log user in, send JWT
+
+  createSendToken(user, 200, res);
+
+  //User.findByIDAndUpdate -> we can not use it because: validation is not going to work!  because mongo is not keeping curren object in memory so this.something would not work
+  // and pre('save') middlewares are not going to work and the password is not going to be encrypted
 });
