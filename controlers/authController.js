@@ -1,8 +1,13 @@
+// const util = require('util');
+const { promisify } = require('util');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('../model/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const sendEmail = require('../utils/email');
 
+console.log(process.env.JWT_EXPIRES_IN);
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -24,6 +29,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
+    passwordChangedAt: req.body.passwordConfirm,
+    role: req.body.role,
   });
 
   const token = signToken(newUser._id);
@@ -86,20 +93,141 @@ exports.protect = catchAsync(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(' ')[1];
   }
-
+  // console.log(token);
+  // console.log('Did you get here???????????');
   if (!token) {
+    console.log('Did you get here????');
     return next(
       new AppError('You are not logged in! Please log in to get access.', 401)
     );
   }
-  console.log(token);
+
   //2) Verification token -jwt is checking if token in proper
+  // verification process if nt successful will throw error :> altering etc
+  // MOST important PART
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  // console.log(decoded);
+  // console.log('Did you get here?');
 
   //3)  check if user still exists
-
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
+    return next(
+      new AppError(
+        'The user belonging to this token does no longer exist.',
+        401
+      )
+    );
+  }
   //4) check if user changes password (token) after the JWT was issued
+  //documents are instances of the model
+  console.log(decoded);
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError('User recently changed password! Please log in again!', 401)
+    );
+  }
 
   // only if all test are going to be passed the next(); is going to be called
   // and middleware is going to bring us to the "route"
+  req.user = currentUser;
+  next(); //grant access to protected route
+});
+
+// how to pass the arguments to middleware! by wrapper function which is going to return the middleware
+exports.restrictTo = (...roles) => (req, _res, next) => {
+  // roles is array - es6 syntax
+
+  // req.user.role -> coming from middleware before one
+  if (!roles.includes(req.user.role)) {
+    return next(
+      new AppError('You do not have permission to perform this action', 403) //403 - forbidden
+    );
+  }
   next();
+};
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  // 1) Get user based on POSTed email
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    return next(new AppError('there is no user with that email address', 404));
+  }
+  // 2) Generate the random reset toke - once more user method!  instance!
+  const resetToken = user.createPasswordResetToken();
+  // await user.save(); // in this way it would give to use error because not all fields are provided
+  await user.save({ validateBeforeSave: false });
+  // 3 send it to user's email
+
+  const resetURL = `${req.protocol}://${req.get(
+    'host'
+  )}/api/v1/users/resetPassword/${resetToken}`;
+
+  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}. \n If you didn't forget your password, please ignore this email!`;
+
+  //he decided to use it because we need to do more than just catch the error
+  //like extension to the global middleware error handler!
+  try {
+    //sending email
+    await sendEmail({
+      email: user.email,
+      subject: 'Your password reset token (valid for 10min)',
+      message: message,
+    });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Token sent to email!',
+      // never put here reset token because everybody can take it. So we use email to make it more secure!
+    });
+  } catch (err) {
+    //we want here reset the token and expired
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+
+    await user.save({ validateBeforeSave: false });
+
+    return next(
+      new AppError(
+        'There was an error sending the email. Try again later!',
+        500
+      )
+    ); // error what happen on server
+  }
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  //1 ) get user based on the token
+
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+  // 2) if token has not expired, and there is user, set the new password
+  // we are doing two things at the same time if token exist and if token expired
+  if (!user) {
+    return next(new AppError('Token is invalid or has expired', 400));
+  }
+
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  //cleaning the not needed fields
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+
+  await user.save(); // we are not switching of the validation because we want to confirm that the password are the same
+  //3;  update changedPasswordAt property for the user
+
+  //4 log the user in, send JWT
+  const token = signToken(user._id);
+
+  res.status(200).json({
+    status: 'success',
+    token,
+  });
 });

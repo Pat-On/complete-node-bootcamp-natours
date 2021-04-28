@@ -24,6 +24,9 @@ const handleValidationErrorDB = (err) => {
   return new AppError(message, 400);
 };
 
+const handleJWTExpiredError = () =>
+  new AppError('Your token has expired! Please log in again,', 401);
+
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -32,6 +35,9 @@ const sendErrorDev = (err, res) => {
     stack: err.stack,
   });
 };
+
+const handleJWTError = () =>
+  new AppError('Invalid token. Plase log in again!', 401);
 
 //STANDARD WAY OF DEALING IT
 const sendErrorProduction = (err, res) => {
@@ -78,11 +84,12 @@ module.exports = (err, req, res, next) => {
     //another change in the mongo error object - no longer error.name
     if (error._message === 'Tour validation failed')
       error = handleValidationErrorDB(error);
-
+    if (error.name === 'JsonWebTokenError') error = handleJWTError();
     //interesting approach based on error stack
     // if (err.stack.substr(0, 15) === 'ValidationError')
     //   error = handleValidationErrorDB(error);
 
+    if (error.name === 'TokenExpiredError') error = handleJWTExpiredError();
     sendErrorProduction(error, res);
   }
 

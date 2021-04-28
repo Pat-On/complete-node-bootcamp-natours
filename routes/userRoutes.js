@@ -9,6 +9,9 @@ const router = express.Router();
 router.post('/signup', authController.signup); // in that case we are going to have route that is only send
 router.post('/login', authController.login);
 
+router.post('/forgotPassword', authController.forgotPassword);
+router.patch('/resetPassword/:token', authController.resetPassword);
+
 router
   .route('')
   .get(userController.getAllUsers)
