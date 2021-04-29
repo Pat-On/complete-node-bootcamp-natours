@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const slugify = require('slugify');
 // const validator = require('validator');
+// const User = require('./userModel');
 
 //---------------------- mongoose ---------------------------
 const tourSchema = new mongoose.Schema(
@@ -118,6 +119,15 @@ const tourSchema = new mongoose.Schema(
         day: Number, // when people would go to this location
       },
     ],
+    guides: [
+      {
+        // /embedded documents -> we are using the type mongoose.Schema.ObjectId to point that
+        // here we are going to have the id to other documents from MongoDB
+        type: mongoose.Schema.ObjectId,
+        ref: 'User', // by this we are establishing the reference by between the collections
+      },
+    ],
+    // guides: Array, //embedded user's ids  -> embedded array of its of users - guides
   },
   {
     //option object we setting that virual are going to be part of output
@@ -153,6 +163,14 @@ tourSchema.pre(/^find/, function (next) {
   this.start = Date.now();
   next();
 });
+
+// code which is going to full schema with the users
+// tourSchema.pre('save', async function (next) {
+//   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
+
+//   next();
+// });
 
 //run after query was executed so we have access to the docs
 // tourSchema.post(/^find/, function (docs, next) {
