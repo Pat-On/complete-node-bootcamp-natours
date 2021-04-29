@@ -180,6 +180,16 @@ tourSchema.pre(/^find/, function (next) {
 // next();
 // });
 
+//All queries by this query middleware will populate the guides fields
+// it is going to happen everywhere on the find methods
+tourSchema.pre('/^find/', function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
+  next();
+});
+
 //AGGREGATION MIDDLEWARE
 tourSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
