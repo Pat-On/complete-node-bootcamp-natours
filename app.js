@@ -4,6 +4,7 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
+const hpp = require('hpp');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controlers/errorController');
@@ -38,6 +39,21 @@ app.use(mongoSanitize());
 
 //DATA SANITIZATION against XSS
 app.use(xss());
+
+//prevent parameter pollution - should be use at the end because iti  clearing the query string.
+app.use(
+  hpp({
+    whitelist: [
+      //properties what we allow to duplicate
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'price',
+    ],
+  })
+);
 
 //serving the static files
 app.use(express.static(`${__dirname}/public`));
