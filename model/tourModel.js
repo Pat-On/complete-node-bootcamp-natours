@@ -88,6 +88,36 @@ const tourSchema = new mongoose.Schema(
     },
     //"2021-03-21" -> and mongo would pass it automatically to date
     //if it is can not parse it, t would then it would throw error
+    startLocation: {
+      //he decided to have start location not in array to ? have it more obvious?
+      // You can put start location to array and have it on index0
+
+      //GeoJSON
+      // this object is really embedded object where we can specify some properties
+      type: {
+        //schema type options for type
+        type: String,
+        default: 'Point',
+        enum: ['Point'], // limiting that field only to "Point" option
+      },
+      coordinates: [Number], //longitude first and then latitude:
+      address: String,
+      description: String,
+    },
+    //embedded documents
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number, // when people would go to this location
+      },
+    ],
   },
   {
     //option object we setting that virual are going to be part of output
