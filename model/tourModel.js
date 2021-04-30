@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const slugify = require('slugify');
 // const validator = require('validator');
+// const User = require('./userModel');
 
 //---------------------- mongoose ---------------------------
 const tourSchema = new mongoose.Schema(
@@ -88,6 +89,45 @@ const tourSchema = new mongoose.Schema(
     },
     //"2021-03-21" -> and mongo would pass it automatically to date
     //if it is can not parse it, t would then it would throw error
+    startLocation: {
+      //he decided to have start location not in array to ? have it more obvious?
+      // You can put start location to array and have it on index0
+
+      //GeoJSON
+      // this object is really embedded object where we can specify some properties
+      type: {
+        //schema type options for type
+        type: String,
+        default: 'Point',
+        enum: ['Point'], // limiting that field only to "Point" option
+      },
+      coordinates: [Number], //longitude first and then latitude:
+      address: String,
+      description: String,
+    },
+    //embedded documents
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number, // when people would go to this location
+      },
+    ],
+    guides: [
+      {
+        // /embedded documents -> we are using the type mongoose.Schema.ObjectId to point that
+        // here we are going to have the id to other documents from MongoDB
+        type: mongoose.Schema.ObjectId,
+        ref: 'User', // by this we are establishing the reference by between the collections
+      },
+    ],
+    // guides: Array, //embedded user's ids  -> embedded array of its of users - guides
   },
   {
     //option object we setting that virual are going to be part of output
@@ -100,9 +140,16 @@ tourSchema.virtual('durationWeeks').get(function () {
   //we used regular function because arrow function is not getting its own
   //this key word - we can not use them in query because they are not part of data base
 
-  return this.durration / 7;
+  return this.duration / 7;
 });
-// DOCUMENT MIDDLEWARE: runs before .save() and .create() but .inserMany() is not going trigger it
+
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour', // field in the Review model where is data stored
+  localField: '_id', // where the id is stored in local field in Review
+});
+
+// DOCUMENT MIDDLEWARE: runs before .save() and .create() but .insertMany() is not going trigger it
 tourSchema.pre('save', function (next) {
   // console.log(this); //this is going to be our document
   this.slug = slugify(this.name, { lower: true });
@@ -124,6 +171,14 @@ tourSchema.pre(/^find/, function (next) {
   next();
 });
 
+// code which is going to full schema with the users
+// tourSchema.pre('save', async function (next) {
+//   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
+
+//   next();
+// });
+
 //run after query was executed so we have access to the docs
 // tourSchema.post(/^find/, function (docs, next) {
 // console.log(`query took: ${Date.now() - this.start} milliseconds`);
@@ -131,6 +186,16 @@ tourSchema.pre(/^find/, function (next) {
 
 // next();
 // });
+
+//All queries by this query middleware will populate the guides fields
+// it is going to happen everywhere on the find methods
+tourSchema.pre('/^find/', function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
+  next();
+});
 
 //AGGREGATION MIDDLEWARE
 tourSchema.pre('aggregate', function (next) {

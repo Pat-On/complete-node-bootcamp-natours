@@ -1,8 +1,14 @@
 const express = require('express');
-const tourController = require('../controlers/tourController');
-const authController = require('../controlers/authController');
+const tourController = require('../controllers/tourController');
+const authController = require('../controllers/authController');
+// const reviewController = require('../controllers/reviewController');
+const reviewRouter = require('./reviewRouter');
 
 const router = express.Router();
+
+//v158 nested routed with express - router is just middleware
+//mounting the routes like in app.js
+router.use('/:tourId/reviews', reviewRouter);
 
 // router.use(express.json());
 //param middleware
@@ -32,5 +38,18 @@ router
     authController.restrictTo('admin', 'lead-guid'),
     tourController.deleteTour
   );
+
+//Post /tour/id_of_Tour/reviews and user id is coming from currently
+//logged user
+// this is example of the nester route - clear parent child relationship
+
+//simple nested route reviews belong to tours
+// router
+//   .route('/:tourId/reviews')
+//   .post(
+//     authController.protect,
+//     authController.restrictTo('user'),
+//     reviewController.createReview
+//   );
 
 module.exports = router;
