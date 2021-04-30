@@ -1,6 +1,7 @@
 const express = require('express');
 const tourController = require('../controllers/tourController');
 const authController = require('../controllers/authController');
+const reviewController = require('../controllers/reviewController');
 
 const router = express.Router();
 
@@ -31,6 +32,18 @@ router
     authController.protect,
     authController.restrictTo('admin', 'lead-guid'),
     tourController.deleteTour
+  );
+
+//Post /tour/id_of_Tour/reviews and user id is coming from currently
+//logged user
+// this is example of the nester route - clear parent child relationship
+
+router
+  .route('/:tourId/reviews')
+  .post(
+    authController.protect,
+    authController.restrictTo('user'),
+    reviewController.createReview
   );
 
 module.exports = router;
