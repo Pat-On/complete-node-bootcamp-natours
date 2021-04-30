@@ -1,8 +1,9 @@
 // const fs = require('fs');
 const Tour = require('../model/tourModel');
-const APIFeatures = require('../utils/apiFeatures');
-const AppError = require('../utils/appError');
+// const APIFeatures = require('../utils/apiFeatures');
+// const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const factoryFunction = require('./handlerFactory');
 
 //our middleware modifying the req.query
 exports.aliasTopTours = (req, res, next) => {
@@ -11,147 +12,158 @@ exports.aliasTopTours = (req, res, next) => {
   req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
   next();
 };
+exports.getAllTours = factoryFunction.getAll(Tour);
 
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  // try {
-  // !IMPORTANT in that case we would have to do documentation, to teach user how to use it
+// exports.getAllTours = catchAsync(async (req, res, next) => {
+//   // try {
+//   // !IMPORTANT in that case we would have to do documentation, to teach user how to use it
 
-  // EXECUTE QUERY
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const tours = await features.query;
-  //basically it is just chaining the methods
-  //query.sort().select().skip().limit() <- chained method of query object -> mongoose
+//   // EXECUTE QUERY
+//   const features = new APIFeatures(Tour.find(), req.query)
+//     .filter()
+//     .sort()
+//     .limitFields()
+//     .paginate();
+//   const tours = await features.query;
+//   //basically it is just chaining the methods
+//   //query.sort().select().skip().limit() <- chained method of query object -> mongoose
 
-  //SEND RESPONSE
-  res.status(200).json({
-    status: 'success',
+//   //SEND RESPONSE
+//   res.status(200).json({
+//     status: 'success',
 
-    results: tours.length, // it is not exactly from specification but it is useful for front app to do it
-    data: {
-      tours: tours, //ES6 just tours - k and v the same
-    },
-  });
-  // } catch (err) {
-  //   res.status(404).json({
-  //     status: 'fail',
-  //     message: err,
-  //   });
-  // }
-});
+//     results: tours.length, // it is not exactly from specification but it is useful for front app to do it
+//     data: {
+//       tours: tours, //ES6 just tours - k and v the same
+//     },
+//   });
+//   // } catch (err) {
+//   //   res.status(404).json({
+//   //     status: 'fail',
+//   //     message: err,
+//   //   });
+//   // }
+// });
 
-exports.getTour = catchAsync(async (req, res, next) => {
-  // try {
-  // const tour = await Tour.findById(req.params.id).populate({
-  //   path: 'guides',
-  //   select: '-__v -passwordChangedAt',
-  // });
-  const tour = await Tour.findById(req.params.id)
-    // .populate({
-    //   path: 'guides',
-    //   select: '-__v -passwordChangedAt',
-    // })
-    .populate('reviews');
-  //Tour.findOne({_id: req.params.id})- normal solution
+exports.getTour = factoryFunction.getOne(Tour, { path: 'reviews' });
 
-  if (!tour) {
-    return next(new AppError('no Tour found with that ID', 404));
-  }
+// exports.getTour = catchAsync(async (req, res, next) => {
+//   // try {
+//   // const tour = await Tour.findById(req.params.id).populate({
+//   //   path: 'guides',
+//   //   select: '-__v -passwordChangedAt',
+//   // });
+//   const tour = await Tour.findById(req.params.id)
+//     // .populate({
+//     //   path: 'guides',
+//     //   select: '-__v -passwordChangedAt',
+//     // })
+//     .populate('reviews');
+//   //Tour.findOne({_id: req.params.id})- normal solution
 
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-  // } catch (err) {
-  //   res.status(400).json({
-  //     status: 'fail',
-  //     message: 'Invalid data sent!',
-  //   });
-  // }
-});
+//   if (!tour) {
+//     return next(new AppError('no Tour found with that ID', 404));
+//   }
 
-exports.createTour = catchAsync(async (req, res, next) => {
-  const newTour = await Tour.create(req.body);
+//   res.status(201).json({
+//     status: 'success',
+//     data: {
+//       tour,
+//     },
+//   });
+//   // } catch (err) {
+//   //   res.status(400).json({
+//   //     status: 'fail',
+//   //     message: 'Invalid data sent!',
+//   //   });
+//   // }
+// });
 
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour: newTour,
-    },
-  });
+// Factory function
+exports.createTour = factoryFunction.createOne(Tour);
 
-  // try {
-  //   // const newTours = new Tour({})
-  //   // newTours.save
+// exports.createTour = catchAsync(async (req, res, next) => {
+//   const newTour = await Tour.create(req.body);
 
-  //   //we call create function on the model itself - create return promise
-  //   const newTour = await Tour.create(req.body);
+//   res.status(201).json({
+//     status: 'success',
+//     data: {
+//       tour: newTour,
+//     },
+//   });
 
-  //   res.status(201).json({
-  //     status: 'success',
-  //     data: {
-  //       tour: newTour,
-  //     },
-  //   });
-  // } catch (err) {
-  //   res.status(400).json({
-  //     status: 'fail',
-  //     message: err,
-  //   });
-  // }
-});
+//   // try {
+//   //   // const newTours = new Tour({})
+//   //   // newTours.save
 
-exports.updateTour = catchAsync(async (req, res, next) => {
-  // try {
-  // we are going to update the item by id - logical
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    // options
-    new: true, // new updated document would be returned to client
-    runValidators: true, // we are going to trigger check again - validator base on the model's schema nice!
-  });
+//   //   //we call create function on the model itself - create return promise
+//   //   const newTour = await Tour.create(req.body);
 
-  if (!tour) {
-    return next(new AppError('no Tour found with that ID', 404));
-  }
+//   //   res.status(201).json({
+//   //     status: 'success',
+//   //     data: {
+//   //       tour: newTour,
+//   //     },
+//   //   });
+//   // } catch (err) {
+//   //   res.status(400).json({
+//   //     status: 'fail',
+//   //     message: err,
+//   //   });
+//   // }
+// });
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-  // } catch (err) {
-  //   res.status(400).json({
-  //     status: 'fail',
-  //     message: err,
-  //   });
-  // }
-});
+// Factory function
+exports.updateTour = factoryFunction.updateOne(Tour);
 
-exports.deleteTour = catchAsync(async (req, res, next) => {
-  // try {
-  const tour = await Tour.findByIdAndDelete(req.params.id);
+// exports.updateTour = catchAsync(async (req, res, next) => {
+//   // try {
+//   // we are going to update the item by id - logical
+//   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+//     // options
+//     new: true, // new updated document would be returned to client
+//     runValidators: true, // we are going to trigger check again - validator base on the model's schema nice!
+//   });
 
-  if (!tour) {
-    return next(new AppError('no Tour found with that ID', 404));
-  }
+//   if (!tour) {
+//     return next(new AppError('no Tour found with that ID', 404));
+//   }
 
-  res.status(204).json({
-    status: 'success',
-    data: null, //null mean that the data is no longer existing
-  });
-  // } catch (err) {
-  //   res.status(400).json({
-  //     status: 'fail',
-  //     message: err,
-  //   });
-  // }
-});
+//   res.status(200).json({
+//     status: 'success',
+//     data: {
+//       tour,
+//     },
+//   });
+//   // } catch (err) {
+//   //   res.status(400).json({
+//   //     status: 'fail',
+//   //     message: err,
+//   //   });
+//   // }
+// });
+// FACTORY FUNCTION SOLUTION
+exports.deleteTour = factoryFunction.deleteOne(Tour);
+
+//old solution// exports.deleteTour = catchAsync(async (req, res, next) => {
+//   // try {
+//   const tour = await Tour.findByIdAndDelete(req.params.id);
+
+//   if (!tour) {
+//     return next(new AppError('no Tour found with that ID', 404));
+//   }
+
+//   res.status(204).json({
+//     status: 'success',
+//     data: null, //null mean that the data is no longer existing
+//   });
+//   // } catch (err) {
+//   //   res.status(400).json({
+//   //     status: 'fail',
+//   //     message: err,
+//   //   });
+//   // }
+// });
 
 //aggregation-pipeline
 exports.getTourStats = catchAsync(async (req, res, next) => {

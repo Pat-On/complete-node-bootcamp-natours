@@ -2,6 +2,7 @@ const User = require('../model/userModel');
 // const APIFeatures = require('../utils/apiFeatures');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const factoryFunction = require('./handlerFactory');
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -10,19 +11,20 @@ const filterObj = (obj, ...allowedFields) => {
   });
   return newObj;
 };
+exports.getAllUsers = factoryFunction.getAll(User);
 
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
+// exports.getAllUsers = catchAsync(async (req, res, next) => {
+//   const users = await User.find();
 
-  //send response
-  res.status(200).json({
-    status: 'success',
-    results: users.length,
-    data: {
-      users,
-    },
-  });
-});
+//   //send response
+//   res.status(200).json({
+//     status: 'success',
+//     results: users.length,
+//     data: {
+//       users,
+//     },
+//   });
+// });
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   // 1)  create error if user POSTs password data
@@ -62,29 +64,16 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'this route is not yet defined!',
-  });
-};
+exports.getUser = factoryFunction.getOne(User);
 
 exports.createUser = (req, res) => {
   res.status(500).json({
     status: 'error',
-    message: 'this route is not yet defined!',
-  });
-};
-exports.updateUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'this route is not yet defined!',
+    message: 'This route is not defined! Please use /signup instead',
   });
 };
 
-exports.deleteUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'this route is not yet defined!',
-  });
-};
+//It is going to be implemented for administrators
+exports.updateUser = factoryFunction.updateOne(User); // <-only administrators
+//reason when we are using findByIdAndUpdate all save middleware are not running
+exports.deleteUser = factoryFunction.deleteOne(User);
