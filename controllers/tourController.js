@@ -44,37 +44,39 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
   // }
 });
 
-exports.getTour = catchAsync(async (req, res, next) => {
-  // try {
-  // const tour = await Tour.findById(req.params.id).populate({
-  //   path: 'guides',
-  //   select: '-__v -passwordChangedAt',
-  // });
-  const tour = await Tour.findById(req.params.id)
-    // .populate({
-    //   path: 'guides',
-    //   select: '-__v -passwordChangedAt',
-    // })
-    .populate('reviews');
-  //Tour.findOne({_id: req.params.id})- normal solution
+exports.getTour = factoryFunction.getOne(Tour, { path: 'reviews' });
 
-  if (!tour) {
-    return next(new AppError('no Tour found with that ID', 404));
-  }
+// exports.getTour = catchAsync(async (req, res, next) => {
+//   // try {
+//   // const tour = await Tour.findById(req.params.id).populate({
+//   //   path: 'guides',
+//   //   select: '-__v -passwordChangedAt',
+//   // });
+//   const tour = await Tour.findById(req.params.id)
+//     // .populate({
+//     //   path: 'guides',
+//     //   select: '-__v -passwordChangedAt',
+//     // })
+//     .populate('reviews');
+//   //Tour.findOne({_id: req.params.id})- normal solution
 
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-  // } catch (err) {
-  //   res.status(400).json({
-  //     status: 'fail',
-  //     message: 'Invalid data sent!',
-  //   });
-  // }
-});
+//   if (!tour) {
+//     return next(new AppError('no Tour found with that ID', 404));
+//   }
+
+//   res.status(201).json({
+//     status: 'success',
+//     data: {
+//       tour,
+//     },
+//   });
+//   // } catch (err) {
+//   //   res.status(400).json({
+//   //     status: 'fail',
+//   //     message: 'Invalid data sent!',
+//   //   });
+//   // }
+// });
 
 // Factory function
 exports.createTour = factoryFunction.createOne(Tour);

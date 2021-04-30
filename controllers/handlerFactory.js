@@ -45,3 +45,23 @@ exports.createOne = (Model) =>
       },
     });
   });
+
+exports.getOne = (Model, popOptions) =>
+  catchAsync(async (req, res, next) => {
+    let query = Model.findById(req.params.id); //saving query as a variable to later await it when entire
+    //query is ready
+    if (popOptions) query = query.populate(popOptions);
+
+    const doc = await query;
+
+    if (!doc) {
+      return next(new AppError('No doc found with that ID', 404));
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        data: doc,
+      },
+    });
+  });

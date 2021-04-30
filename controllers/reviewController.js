@@ -38,6 +38,8 @@ exports.setTourUserIds = (req, res, next) => {
 //     },
 //   });
 // });
+
+exports.getReview = factoryFunction.getOne(Review);
 exports.createReview = factoryFunction.createOne(Review);
 exports.updateReview = factoryFunction.updateOne(Review);
 exports.deleteReview = factoryFunction.deleteOne(Review);
