@@ -7,13 +7,14 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 
 const AppError = require('./utils/appError');
-const globalErrorHandler = require('./controlers/errorController');
+const globalErrorHandler = require('./controllers/errorController');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const reviewRouter = require('./routes/reviewRouter');
 
 const app = express();
-console.log(process.env.NODE_ENV);
+// console.log(process.env.NODE_ENV);
 //1) MIDDLEWARE GLOBAL
 //SET SECURITY HTTP HEADERS
 app.use(helmet());
@@ -69,6 +70,7 @@ app.use((req, res, next) => {
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter); // function on the left is middleware function
 
 app.all('*', (req, res, next) => {
   // res.status(404).json({

@@ -140,7 +140,7 @@ tourSchema.virtual('durationWeeks').get(function () {
   //we used regular function because arrow function is not getting its own
   //this key word - we can not use them in query because they are not part of data base
 
-  return this.durration / 7;
+  return this.duration / 7;
 });
 // DOCUMENT MIDDLEWARE: runs before .save() and .create() but .inserMany() is not going trigger it
 tourSchema.pre('save', function (next) {
