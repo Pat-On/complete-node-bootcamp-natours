@@ -1,7 +1,7 @@
 // const fs = require('fs');
 const Tour = require('../model/tourModel');
-const APIFeatures = require('../utils/apiFeatures');
-const AppError = require('../utils/appError');
+// const APIFeatures = require('../utils/apiFeatures');
+// const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const factoryFunction = require('./handlerFactory');
 
@@ -12,37 +12,38 @@ exports.aliasTopTours = (req, res, next) => {
   req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
   next();
 };
+exports.getAllTours = factoryFunction.getAll(Tour);
 
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  // try {
-  // !IMPORTANT in that case we would have to do documentation, to teach user how to use it
+// exports.getAllTours = catchAsync(async (req, res, next) => {
+//   // try {
+//   // !IMPORTANT in that case we would have to do documentation, to teach user how to use it
 
-  // EXECUTE QUERY
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const tours = await features.query;
-  //basically it is just chaining the methods
-  //query.sort().select().skip().limit() <- chained method of query object -> mongoose
+//   // EXECUTE QUERY
+//   const features = new APIFeatures(Tour.find(), req.query)
+//     .filter()
+//     .sort()
+//     .limitFields()
+//     .paginate();
+//   const tours = await features.query;
+//   //basically it is just chaining the methods
+//   //query.sort().select().skip().limit() <- chained method of query object -> mongoose
 
-  //SEND RESPONSE
-  res.status(200).json({
-    status: 'success',
+//   //SEND RESPONSE
+//   res.status(200).json({
+//     status: 'success',
 
-    results: tours.length, // it is not exactly from specification but it is useful for front app to do it
-    data: {
-      tours: tours, //ES6 just tours - k and v the same
-    },
-  });
-  // } catch (err) {
-  //   res.status(404).json({
-  //     status: 'fail',
-  //     message: err,
-  //   });
-  // }
-});
+//     results: tours.length, // it is not exactly from specification but it is useful for front app to do it
+//     data: {
+//       tours: tours, //ES6 just tours - k and v the same
+//     },
+//   });
+//   // } catch (err) {
+//   //   res.status(404).json({
+//   //     status: 'fail',
+//   //     message: err,
+//   //   });
+//   // }
+// });
 
 exports.getTour = factoryFunction.getOne(Tour, { path: 'reviews' });
 
