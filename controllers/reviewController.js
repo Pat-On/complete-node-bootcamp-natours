@@ -2,7 +2,11 @@ const Review = require('../model/reviewModel');
 const catchAsync = require('../utils/catchAsync');
 
 exports.getAllReview = catchAsync(async (req, res, next) => {
-  const reviews = await Review.find();
+  //if the req is coming from nested rout it is going to filter only requested review
+  let filter;
+  if (req.params.tourId) filter = { tour: req.params.tourId };
+
+  const reviews = await Review.find(filter);
 
   res.status(200).json({
     status: 'success',
@@ -15,7 +19,7 @@ exports.getAllReview = catchAsync(async (req, res, next) => {
 
 exports.createReview = catchAsync(async (req, res, next) => {
   //allow nested routes
-  console.log(req.params.tourId);
+  // console.log(req.params.tourId);
   if (!req.body.tour) req.body.tour = req.params.tourId;
   if (!req.body.user) req.body.user = req.user.id; // we are getting user from protected middleware
 
