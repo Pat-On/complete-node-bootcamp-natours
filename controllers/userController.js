@@ -76,11 +76,8 @@ exports.createUser = (req, res) => {
     message: 'this route is not yet defined!',
   });
 };
-exports.updateUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'this route is not yet defined!',
-  });
-};
 
+//It is going to be implemented for administrators
+exports.updateUser = factoryFunction.updateOne(User); // <-only administrators
+//reason when we are using findByIdAndUpdate all save middleware are not running
 exports.deleteUser = factoryFunction.deleteOne(User);
