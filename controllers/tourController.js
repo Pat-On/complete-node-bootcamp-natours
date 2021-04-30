@@ -3,6 +3,7 @@ const Tour = require('../model/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const factoryFunction = require('./handlerFactory');
 
 //our middleware modifying the req.query
 exports.aliasTopTours = (req, res, next) => {
@@ -132,26 +133,28 @@ exports.updateTour = catchAsync(async (req, res, next) => {
   //   });
   // }
 });
+// FACTORY FUNCTION SOLUTION
+exports.deleteTour = factoryFunction.deleteOne(Tour);
 
-exports.deleteTour = catchAsync(async (req, res, next) => {
-  // try {
-  const tour = await Tour.findByIdAndDelete(req.params.id);
+//old solution// exports.deleteTour = catchAsync(async (req, res, next) => {
+//   // try {
+//   const tour = await Tour.findByIdAndDelete(req.params.id);
 
-  if (!tour) {
-    return next(new AppError('no Tour found with that ID', 404));
-  }
+//   if (!tour) {
+//     return next(new AppError('no Tour found with that ID', 404));
+//   }
 
-  res.status(204).json({
-    status: 'success',
-    data: null, //null mean that the data is no longer existing
-  });
-  // } catch (err) {
-  //   res.status(400).json({
-  //     status: 'fail',
-  //     message: err,
-  //   });
-  // }
-});
+//   res.status(204).json({
+//     status: 'success',
+//     data: null, //null mean that the data is no longer existing
+//   });
+//   // } catch (err) {
+//   //   res.status(400).json({
+//   //     status: 'fail',
+//   //     message: err,
+//   //   });
+//   // }
+// });
 
 //aggregation-pipeline
 exports.getTourStats = catchAsync(async (req, res, next) => {

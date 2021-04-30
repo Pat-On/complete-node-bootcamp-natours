@@ -1,5 +1,6 @@
 const Review = require('../model/reviewModel');
 const catchAsync = require('../utils/catchAsync');
+const factoryFunction = require('./handlerFactory');
 
 exports.getAllReview = catchAsync(async (req, res, next) => {
   //if the req is coming from nested rout it is going to filter only requested review
@@ -32,3 +33,5 @@ exports.createReview = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.deleteReview = factoryFunction.deleteOne(Review);
