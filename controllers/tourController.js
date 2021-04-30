@@ -49,10 +49,12 @@ exports.getTour = catchAsync(async (req, res, next) => {
   //   path: 'guides',
   //   select: '-__v -passwordChangedAt',
   // });
-  const tour = await Tour.findById(req.params.id).populate({
-    path: 'guides',
-    select: '-__v -passwordChangedAt',
-  });
+  const tour = await Tour.findById(req.params.id)
+    // .populate({
+    //   path: 'guides',
+    //   select: '-__v -passwordChangedAt',
+    // })
+    .populate('reviews');
   //Tour.findOne({_id: req.params.id})- normal solution
 
   if (!tour) {

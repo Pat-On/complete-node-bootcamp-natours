@@ -142,7 +142,14 @@ tourSchema.virtual('durationWeeks').get(function () {
 
   return this.duration / 7;
 });
-// DOCUMENT MIDDLEWARE: runs before .save() and .create() but .inserMany() is not going trigger it
+
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour', // field in the Review model where is data stored
+  localField: '_id', // where the id is stored in local field in Review
+});
+
+// DOCUMENT MIDDLEWARE: runs before .save() and .create() but .insertMany() is not going trigger it
 tourSchema.pre('save', function (next) {
   // console.log(this); //this is going to be our document
   this.slug = slugify(this.name, { lower: true });
