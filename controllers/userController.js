@@ -12,7 +12,7 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-exports.getMe = (req, rres, next) => {
+exports.getMe = (req, res, next) => {
   req.params.id = req.user.id;
   next();
 };
