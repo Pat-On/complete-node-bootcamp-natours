@@ -17,7 +17,12 @@ router.patch(
   authController.protect,
   authController.updatePassword
 );
-
+router.get(
+  '/me',
+  authController.protect, //adding user in req.user
+  userController.getMe, //adding from user.id id to req.params.id
+  userController.getUser // normal
+);
 router.patch('/updateMe', authController.protect, userController.updateMe);
 router.delete('/deleteMe', authController.protect, userController.deleteMe);
 
