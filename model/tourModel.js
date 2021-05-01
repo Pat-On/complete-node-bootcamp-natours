@@ -41,6 +41,7 @@ const tourSchema = new mongoose.Schema(
       //min max work with dates too
       min: [1, 'Rating must be more than 1'],
       max: [5, 'Rating must be less than 5'],
+      set: (val) => Math.round(val * 10) / 10, //rounding number - funny way :>
     },
     ratingsQuantity: {
       type: Number,
@@ -136,6 +137,12 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+// tourSchema.index({ price: 1 }); //single field index
+tourSchema.index({ price: 1, ratingsAverage: -1 }); //compound index are doing job for single req as well
+tourSchema.index({ slug: 1 }); // 1 or -1 is not so important
+
+tourSchema.index({ startLocation: '2dsphere' }); //geo json -> earth like sphere
+
 tourSchema.virtual('durationWeeks').get(function () {
   //we used regular function because arrow function is not getting its own
   //this key word - we can not use them in query because they are not part of data base
@@ -197,13 +204,15 @@ tourSchema.pre('/^find/', function (next) {
   next();
 });
 
+//!IMPORTANT
+//return to it - how to set it to work with geoNear
 //AGGREGATION MIDDLEWARE
-tourSchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+// tourSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
 
-  // console.log(this.pipeline());
-  next();
-});
+//   console.log(this.pipeline());
+//   next();
+// });
 
 // convention to use capital in that case - model declaration
 const Tour = mongoose.model('Tour', tourSchema);

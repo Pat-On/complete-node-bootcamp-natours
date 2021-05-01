@@ -5,6 +5,8 @@ const authController = require('../controllers/authController');
 //by default each router have access only to its specific params.
 const router = express.Router({ mergeParams: true });
 
+router.use(authController.protect);
+
 router.route('/').get(reviewController.getAllReview).post(
   authController.protect, //logged
   authController.restrictTo('user'), //restriction to user
@@ -15,7 +17,13 @@ router.route('/').get(reviewController.getAllReview).post(
 router
   .route('/:id')
   .get(reviewController.getReview)
-  .patch(reviewController.updateReview)
-  .delete(reviewController.deleteReview);
+  .patch(
+    authController.restrictTo('user', 'admin'),
+    reviewController.updateReview
+  )
+  .delete(
+    authController.restrictTo('user', 'admin'),
+    reviewController.deleteReview
+  );
 
 module.exports = router;
