@@ -35,6 +35,8 @@ router
 // /tours-distance?distance=233&center=-40,45&unit=mi
 // /tours-distance/233/center/-40,45/unit/mi    <-he said that looks cleaner
 
+router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
+
 router
   .route('/')
   // this authController.protect - is going actively protect not log in users to get access to it

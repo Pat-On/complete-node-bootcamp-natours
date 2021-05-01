@@ -271,7 +271,6 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
 // '/tours-within/:distance/center/:latlng/unit/:unit',
 // /tours-within/233/center/-40,45/unit/mi    <-he said that looks cleaner
 exports.getToursWithin = catchAsync(async (req, res, next) => {
-  console.log('?');
   const { distance, latlng, unit } = req.params;
 
   const [lat, lng] = latlng.split(',');
@@ -295,5 +294,49 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
   res.status(200).json({
     results: tours.length,
     data: { data: tours },
+  });
+});
+
+exports.getDistances = catchAsync(async (req, res, next) => {
+  console.log('???');
+  const { latlng, unit } = req.params;
+
+  const [lat, lng] = latlng.split(',');
+
+  const multiplier = unit === 'mi' ? 0.000621371 : 0.001;
+
+  if (!lat || !lng) {
+    next(
+      new AppError(
+        'Please provide latitude and longitude in the format lat,lng',
+        400
+      )
+    );
+  }
+
+  const distances = await Tour.aggregate([
+    {
+      //the only geo=Agregation special
+      $geoNear: {
+        //require one field with geospatial index
+        near: {
+          //geoJSON
+          type: 'Point',
+          coordinates: [lng * 1, lat * 1],
+        },
+        distanceField: 'distance',
+        distanceMultiplier: multiplier, // field where are going to be stored calculated distances
+      },
+    },
+    {
+      $project: {
+        distance: 1,
+        name: 1,
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    data: { data: distances },
   });
 });

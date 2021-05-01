@@ -204,13 +204,15 @@ tourSchema.pre('/^find/', function (next) {
   next();
 });
 
+//!IMPORTANT
+//return to it - how to set it to work with geoNear
 //AGGREGATION MIDDLEWARE
-tourSchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+// tourSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
 
-  // console.log(this.pipeline());
-  next();
-});
+//   console.log(this.pipeline());
+//   next();
+// });
 
 // convention to use capital in that case - model declaration
 const Tour = mongoose.model('Tour', tourSchema);
