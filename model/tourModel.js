@@ -136,6 +136,10 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+// tourSchema.index({ price: 1 }); //single field index
+tourSchema.index({ price: 1, ratingsAverage: -1 }); //compound index are doing job for single req as well
+tourSchema.index({ slug: 1 }); // 1 or -1 is not so important
+
 tourSchema.virtual('durationWeeks').get(function () {
   //we used regular function because arrow function is not getting its own
   //this key word - we can not use them in query because they are not part of data base
