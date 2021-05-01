@@ -28,6 +28,13 @@ router
     tourController.getMonthlyPlan
   );
 
+//something new in this course but it is standard way
+router
+  .route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(tourController.getToursWithin);
+// /tours-distance?distance=233&center=-40,45&unit=mi
+// /tours-distance/233/center/-40,45/unit/mi    <-he said that looks cleaner
+
 router
   .route('/')
   // this authController.protect - is going actively protect not log in users to get access to it
