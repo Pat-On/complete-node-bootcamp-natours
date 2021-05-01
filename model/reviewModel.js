@@ -34,6 +34,8 @@ const reviewSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+// limiting review - it may not work straight ahead
+// reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
 
 //middleware
 reviewSchema.pre(/^find/, function (next) {
@@ -58,6 +60,7 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
   // console.log(tourId);
   const stats = await this.aggregate([
     { $match: { tour: tourId } },
+    // if there is no match we are going to have error in Tour.findByIdAndUpdate
     {
       $group: {
         _id: '$tour',
@@ -66,12 +69,21 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
       },
     },
   ]);
-  console.log(stats);
+  // console.log(stats);
   // updating the tour results - savings statistic to the current tour
-  await Tour.findByIdAndUpdate(tourId, {
-    ratingsQuantity: stats[0].nRating,
-    ratingsAverage: stats[0].avgRating,
-  });
+
+  if (stats.length > 0) {
+    // against error
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: stats[0].nRating,
+      ratingsAverage: stats[0].avgRating,
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: 0,
+      ratingsAverage: 4.5,
+    });
+  }
 };
 
 reviewSchema.post('save', function () {
@@ -81,6 +93,25 @@ reviewSchema.post('save', function () {
   //so basically here we are attaching it to constructor -> accessible on model!
   this.constructor.calcAverageRatings(this.tour);
   // next();
+});
+
+// we can not change here for post because query is already executed
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+  this.r = await this.findOne(); //here is still old review object, before update
+  // console.log(this.r);
+  // console.log(
+  //   '*************************************************************************'
+  // );
+  // console.log(this);
+  next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function () {
+  // this.findOne(); does NOT work here, query has already executed
+
+  // here is best time to call the static unction because the object was already ipdated
+  // console.log(`<here>${this.r}`);
+  await this.r.constructor.calcAverageRatings(this.r.tour);
 });
 
 const Review = mongoose.model('Review', reviewSchema);
