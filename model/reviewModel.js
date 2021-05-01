@@ -78,6 +78,7 @@ reviewSchema.post('save', function () {
   //this points to current review
   // this.constructor; //it is model which is created the model - review
 
+  //so basically here we are attaching it to constructor -> accessible on model!
   this.constructor.calcAverageRatings(this.tour);
   // next();
 });
