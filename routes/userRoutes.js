@@ -12,6 +12,12 @@ router.post('/login', authController.login);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
+// all below - you need to be authenticated
+
+//at this point we can use the route which is going to protect everything below
+// because middleware are called sequentialy
+router.use(authController.protect); //<= al routes bellow are protected
+
 router.patch(
   '/updateMyPassword',
   authController.protect,
@@ -19,12 +25,22 @@ router.patch(
 );
 router.get(
   '/me',
-  authController.protect, //adding user in req.user
+  // authController.protect, //adding user in req.user
   userController.getMe, //adding from user.id id to req.params.id
   userController.getUser // normal
 );
-router.patch('/updateMe', authController.protect, userController.updateMe);
-router.delete('/deleteMe', authController.protect, userController.deleteMe);
+router.patch(
+  '/updateMe',
+  // authController.protect,
+  userController.updateMe
+);
+router.delete(
+  '/deleteMe',
+  // authController.protect,
+  userController.deleteMe
+);
+
+router.use(authController.restrictTo('admin')); //<= al routes bellow are protected
 
 router
   .route('')
