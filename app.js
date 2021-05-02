@@ -78,6 +78,7 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
   //rendering template
   res.status(200).render('base', {
+    //passing data to the PUG file
     tour: 'The forest Hiker',
     user: 'Jonas',
   });
