@@ -196,7 +196,8 @@ tourSchema.pre(/^find/, function (next) {
 
 //All queries by this query middleware will populate the guides fields
 // it is going to happen everywhere on the find methods
-tourSchema.pre('/^find/', function (next) {
+tourSchema.pre(/^find/, function (next) {
+  console.log('Populate guides');
   this.populate({
     path: 'guides',
     select: '-__v -passwordChangedAt',
