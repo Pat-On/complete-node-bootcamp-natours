@@ -1,0 +1,53 @@
+doctype html 
+html
+    head
+        meta(charset='UTF-8')
+        meta(name='viewport' content='width=device-width, initial-scale=1.0')
+        //- interpolation
+        title Natours | #{title}
+        //- You can not use title= because it would consider all on right hand as a js
+
+        //- <link rel="stylesheet" href="css/style.css" /> <- we can use regular attributes here as well
+        link(rel='stylesheet' href='/css/style.css')
+        link(rel='shortcut icon' type='image/png' href='/img/favicon.png')
+        link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
+
+
+    body
+        // HEADER
+        include _header
+
+        // CONTENT
+        block content 
+            h1 This is a placeholder
+
+        // FOOTER
+        include _footer
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //- first lesson about the pug
+        //- h1= tour
+        //- //- buffered code where we can run simple JS
+        //- h2= user.toUpperCase()
+        //- // h1 The Park Camper - visible comment in html 
+
+        //- //- not buffered code 
+        //- - const x = 9
+        //- h2= 2 * x
+
+        //- //- h1 The Park Camper - not visible comment in html 
+        //- p This is just some text
+
