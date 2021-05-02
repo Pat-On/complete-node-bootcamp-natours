@@ -4,7 +4,8 @@ html
         meta(charset='UTF-8')
         meta(name='viewport' content='width=device-width, initial-scale=1.0')
         //- interpolation
-        title Natours | Exciting tours for adventurous people  //- You can not use title= because it would consider all on right hand as a js
+        title Natours | #{title}
+        //- You can not use title= because it would consider all on right hand as a js
 
         //- <link rel="stylesheet" href="css/style.css" /> <- we can use regular attributes here as well
         link(rel='stylesheet' href='css/style.css')
@@ -17,8 +18,8 @@ html
         include _header
 
         // CONTENT
-        section.overview 
-            h1= tour
+        block content 
+            h1 This is a placeholder
 
         // FOOTER
         include _footer
