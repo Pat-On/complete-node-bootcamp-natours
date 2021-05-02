@@ -74,9 +74,13 @@ app.use((req, res, next) => {
 
 //3) Routes
 
+//PUG road - way of passing data to pug template
 app.get('/', (req, res) => {
   //rendering template
-  res.status(200).render('base');
+  res.status(200).render('base', {
+    tour: 'The forest Hiker',
+    user: 'Jonas',
+  });
 });
 
 //API ROUTER
