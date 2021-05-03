@@ -6,6 +6,8 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 
+const cookieParser = require('cookie-parser');
+
 const path = require('path');
 
 const AppError = require('./utils/appError');
@@ -45,6 +47,9 @@ app.use('/api', limiter);
 //BODY PARSER, READING DATA FRO< BODY into req.body
 app.use(express.json({ limit: '10kb' })); // <-it really work nice! if we have body larget thant 10 kb It would not be ccepted
 
+// COOKIE PARSER
+app.use(cookieParser());
+
 // DATA SANITIZATION AGAINST NoSQL query injection
 app.use(mongoSanitize());
 
@@ -70,6 +75,7 @@ app.use(
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   // console.log(req.headers);
+  console.log(req.cookies);
   next();
 });
 
