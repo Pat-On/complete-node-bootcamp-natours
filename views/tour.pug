@@ -2,8 +2,9 @@ extends base
 
 //- MIXIN
 include _reviewCard
-
-
+//- it is going to append to the block 
+block append head 
+    //- script(src='/js/mapbox.js')
 
 mixin overviewBox(label, text, icon)
     .overview-box__detail
@@ -73,7 +74,8 @@ block content
                 img.picture-box__img(src=`/img/tours/${img}`, alt=`The Park Camper Tour ${index + 1}`, class=`picture-box__img--${index}`)
 
     section.section-map
-    #map
+    //- we are going to store that data inside the data set to not to do the extra request - mapbox
+    #map(data-locations=`${JSON.stringify(tour.locations)}`)
 
     //- BUG styling is not working like it should - scroll is not styled (horizontal)
     section.section-reviews

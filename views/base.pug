@@ -1,16 +1,18 @@
 doctype html 
 html
     head
-        meta(charset='UTF-8')
-        meta(name='viewport' content='width=device-width, initial-scale=1.0')
-        //- interpolation
-        title Natours | #{title}
-        //- You can not use title= because it would consider all on right hand as a js
+        block head
 
-        //- <link rel="stylesheet" href="css/style.css" /> <- we can use regular attributes here as well
-        link(rel='stylesheet' href='/css/style.css')
-        link(rel='shortcut icon' type='image/png' href='/img/favicon.png')
-        link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
+            meta(charset='UTF-8')
+            meta(name='viewport' content='width=device-width, initial-scale=1.0')
+            //- interpolation
+            title Natours | #{title}
+            //- You can not use title= because it would consider all on right hand as a js
+
+            //- <link rel="stylesheet" href="css/style.css" /> <- we can use regular attributes here as well
+            link(rel='stylesheet' href='/css/style.css')
+            link(rel='shortcut icon' type='image/png' href='/img/favicon.png')
+            link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
 
 
     body
@@ -24,6 +26,8 @@ html
         // FOOTER
         include _footer
 
+        //- it is working in the same way like html -> js import at the end when DOM is rendered 
+        script(src='/js/mapbox.js')
 
 
 
