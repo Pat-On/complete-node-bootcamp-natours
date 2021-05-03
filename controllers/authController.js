@@ -178,6 +178,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   // only if all test are going to be passed the next(); is going to be called
   // and middleware is going to bring us to the "route"
   req.user = currentUser;
+  res.locals.user = currentUser;
   next(); //grant access to protected route
 });
 

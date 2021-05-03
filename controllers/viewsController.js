@@ -53,3 +53,11 @@ exports.getLoginForm = (req, res) => {
       title: 'Log into your account',
     });
 };
+
+exports.getAccount = (req, res) => {
+  //user is already passed via the authorization middleware
+  res.status(200).render('account', {
+    title: 'Your account',
+    user: req.user,
+  });
+};
