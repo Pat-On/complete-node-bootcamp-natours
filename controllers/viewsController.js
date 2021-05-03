@@ -1,6 +1,7 @@
 const Tour = require('../model/tourModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const User = require('../model/userModel');
 
 exports.getOverview = catchAsync(async (req, res, next) => {
   // 1) Get tour data from collection
@@ -58,6 +59,25 @@ exports.getAccount = (req, res) => {
   //user is already passed via the authorization middleware
   res.status(200).render('account', {
     title: 'Your account',
-    user: req.user,
+    // user: req.user,
   });
 };
+
+exports.updateUserData = catchAsync(async (req, res, next) => {
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user.id,
+    {
+      // by this straight ahead assignment we are strip away not wanted data - for example from hack etc
+      name: req.body.name,
+      email: req.body.email,
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+  res.status(200).render('account', {
+    title: 'Your account',
+    user: updatedUser, //passing updated user
+  });
+});

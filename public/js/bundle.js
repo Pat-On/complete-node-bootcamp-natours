@@ -8877,7 +8877,10 @@ var logout = /*#__PURE__*/function () {
 
           case 3:
             res = _context2.sent;
-            if (res.data.status === 'success') location.reload();
+            // if (res.data.status === 'success') location.reload(); // old
+            // console.log(document.URL);
+            if (res.data.status === 'success') window.location.href = '/'; // IS it good solution?
+
             _context2.next = 10;
             break;
 
@@ -8910,7 +8913,7 @@ var _login = require("./login");
 /* eslint-disable */
 //DOM ELEMENTS
 var mapBox = document.getElementById('map');
-var loginForm = document.querySelector('.form');
+var loginForm = document.querySelector('.form--login');
 var logOutBtn = document.querySelector('.nav__el--logout'); // DELEGATION
 
 console.log('I am here?!');
