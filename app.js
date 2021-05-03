@@ -6,6 +6,8 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 
+const cookieParser = require('cookie-parser');
+
 const path = require('path');
 
 const AppError = require('./utils/appError');
@@ -27,7 +29,60 @@ app.use(express.static(path.join(__dirname, 'public')));
 // console.log(process.env.NODE_ENV);
 //1) MIDDLEWARE GLOBAL
 //SET SECURITY HTTP HEADERS
-app.use(helmet());
+// app.use(helmet());
+
+//!IMPORTANT
+// TEMPORARY SOLUTION IN RELATION TO THE CONTENT SECURITY POLICY TODO
+app.use(helmet({ contentSecurityPolicy: false }));
+
+// app.use(
+//   helmet({
+//     contentSecurityPolicy: {
+//       directives: {
+//         defaultSrc: ["'self'", 'data:', 'blob:', 'https:', 'ws:'],
+//         baseUri: ["'self'"],
+//         fontSrc: ["'self'", 'https:', 'data:'],
+//         scriptSrc: [
+//           "'self'",
+//           'https:',
+//           'http:',
+//           'blob:',
+//           'https://*.mapbox.com',
+//           'https://js.stripe.com',
+//           'https://m.stripe.network',
+//           'https://*.cloudflare.com',
+//         ],
+//         frameSrc: ["'self'", 'https://js.stripe.com'],
+//         objectSrc: ["'none'"],
+//         styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
+//         workerSrc: [
+//           "'self'",
+//           'data:',
+//           'blob:',
+//           'https://*.tiles.mapbox.com',
+//           'https://api.mapbox.com',
+//           'https://events.mapbox.com',
+//           'https://m.stripe.network',
+//         ],
+//         childSrc: ["'self'", 'blob:'],
+//         imgSrc: ["'self'", 'data:', 'blob:'],
+//         formAction: ["'self'"],
+//         connectSrc: [
+//           "'self'",
+//           "'unsafe-inline'",
+//           'data:',
+//           'blob:',
+//           'https://*.stripe.com',
+//           'https://*.mapbox.com',
+//           'https://*.cloudflare.com/',
+//           'https://bundle.js:*',
+//           'ws://127.0.0.1:*/',
+//         ],
+//         upgradeInsecureRequests: [],
+//       },
+//     },
+//   })
+// );
 
 //DEVELOPMENT LOGGING
 if (process.env.NODE_ENV === 'development') {
@@ -44,6 +99,12 @@ app.use('/api', limiter);
 
 //BODY PARSER, READING DATA FRO< BODY into req.body
 app.use(express.json({ limit: '10kb' })); // <-it really work nice! if we have body larget thant 10 kb It would not be ccepted
+
+// form parse data - url encoded
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+// COOKIE PARSER
+app.use(cookieParser());
 
 // DATA SANITIZATION AGAINST NoSQL query injection
 app.use(mongoSanitize());
@@ -70,6 +131,7 @@ app.use(
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   // console.log(req.headers);
+  console.log(req.cookies);
   next();
 });
 

@@ -8,6 +8,7 @@ const router = express.Router();
 // signup - is like special case so it is not suitable to other endpoints - divide by philosophy :>
 router.post('/signup', authController.signup); // in that case we are going to have route that is only send
 router.post('/login', authController.login);
+router.get('/logout', authController.logout);
 
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
