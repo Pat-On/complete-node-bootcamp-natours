@@ -116,6 +116,16 @@ exports.login = catchAsync(async (req, res, next) => {
   // });
 });
 
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({
+    status: 'success',
+  });
+};
+
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) getting token and check of it's there
   let token;
@@ -172,34 +182,48 @@ exports.protect = catchAsync(async (req, res, next) => {
 });
 
 // this is only for rendering the pages so he mentioned that there is no error
-exports.isLoggedIn = catchAsync(async (req, res, next) => {
+exports.isLoggedIn = async (req, res, next) => {
+  // we are going to catch errors locally
+
   // if there is cookie we have to go through entire auth tests
   if (req.cookies.jwt) {
-    // 1) via token
-    // authorization is going to happen via cookies always on out side/page
-    const decoded = await promisify(jwt.verify)(
-      req.cookies.jwt,
-      process.env.JWT_SECRET
-    );
+    try {
+      // 1) via token
+      // authorization is going to happen via cookies always on out side/page
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+      );
 
-    // 2) check if user still exists
-    const currentUser = await User.findById(decoded.id);
-    if (!currentUser) {
+      // 2) check if user still exists
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        return next();
+      }
+
+      // 3) check if user changed password after the token was issued
+      if (currentUser.changedPasswordAfter(decoded.iat)) {
+        return next();
+      }
+
+      // there is a logged in user
+      //pug template will have access to it. - we passed the variable by this
+      res.locals.user = currentUser;
+      return next();
+    } catch (error) {
+      // error is going to appear because the tokken what we are sending here is not going to be correct token
+      // there is another solution: you can just delete the cookie immediately by setting time to the past I hope someone sees this and uses this solution instead of the try catch block in the code
+
+      res.cookie('jwt', 'null', {
+        expires: new Date(Date.now() - 10 * 1000),
+        httpOnly: true,
+      });
+      // console.log(error);
       return next();
     }
-
-    // 3) check if user changed password after the token was issued
-    if (currentUser.changedPasswordAfter(decoded.iat)) {
-      return next();
-    }
-
-    // there is a logged in user
-    //pug template will have access to it. - we passed the variable by this
-    res.locals.user = currentUser;
-    return next();
   }
   next();
-});
+};
 
 // how to pass the arguments to middleware! by wrapper function which is going to return the middleware
 exports.restrictTo = (...roles) => (req, _res, next) => {
