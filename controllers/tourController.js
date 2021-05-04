@@ -1,9 +1,47 @@
+const multer = require('multer');
+// const sharp = require('sharp'); // image processing library
+
 // const fs = require('fs');
 const Tour = require('../model/tourModel');
 // const APIFeatures = require('../utils/apiFeatures');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const factoryFunction = require('./handlerFactory');
+
+const multerStorage = multer.memoryStorage(); //img in buffer - faster photo processing
+
+// MULTER FILTER
+const multerFilter = (req, file, cb) => {
+  // we are going to filter only pictures
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Not an Image! Please upload only images.', 400), false);
+  }
+};
+
+//configuration of the multer uploader - without it the data in that case picture would be stored only in memory
+// const upload = multer({ dest: 'public/img/users' });
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+// from different fields
+exports.uploadTourImages = upload.fields([
+  { name: 'imageCover', maxCount: 1 },
+  { name: 'images', maxCount: 3 },
+]);
+
+// when there is one field with many pictures and the same name ----- req.files
+// upload.array("images", 5)
+// when there is single image ------- req.file
+// upload.single('image');
+
+exports.resizeTourImages = (req, res, next) => {
+  console.log(req.files);
+  next();
+};
 
 //our middleware modifying the req.query
 exports.aliasTopTours = (req, res, next) => {
