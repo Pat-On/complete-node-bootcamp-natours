@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 
 const pug = require('pug');
 
-const { fromString } = require('html-to-text');
+const { htmlToText } = require('html-to-text');
 // new Email(user, url).sendWelcome();   .sendPasswordReset
 
 module.exports = class Email {
@@ -55,7 +55,7 @@ module.exports = class Email {
       from: this.from,
       to: this.to,
       subject: subject,
-      text: fromString(html),
+      text: htmlToText(html), // TODO check if it working later - reason depreciated
       html,
     };
 
