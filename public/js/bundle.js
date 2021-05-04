@@ -8923,8 +8923,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 var updateSettings = /*#__PURE__*/function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(data, type) {
-    var url, _res;
-
+    var url, res;
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
@@ -8939,30 +8938,33 @@ var updateSettings = /*#__PURE__*/function () {
             });
 
           case 4:
-            _res = _context.sent;
-            console.log(_res);
+            res = _context.sent;
+            console.log(url);
+            console.log(data);
+            console.log(res.data.status);
+            console.log(res); // console.log(res);
 
-            if (_res.data.status === 'success') {
+            if (res.data.status === 'success') {
               // we defined that status in our response
               (0, _alerts.showAlert)('success', "".concat(type.toUpperCase(), " updated successfully!"));
             }
 
-            _context.next = 14;
+            _context.next = 17;
             break;
 
-          case 9:
-            _context.prev = 9;
+          case 12:
+            _context.prev = 12;
             _context.t0 = _context["catch"](0);
-            console.log(res);
+            console.log(_context.t0.response.data.message);
             console.log(data);
             (0, _alerts.showAlert)('error', _context.t0.response.data.message);
 
-          case 14:
+          case 17:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 9]]);
+    }, _callee, null, [[0, 12]]);
   }));
 
   return function updateSettings(_x, _x2) {
@@ -8971,6 +8973,73 @@ var updateSettings = /*#__PURE__*/function () {
 }();
 
 exports.updateSettings = updateSettings;
+},{"axios":"../../node_modules/axios/index.js","./alerts":"alerts.js"}],"stripe.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.bookTour = void 0;
+
+var _axios = _interopRequireDefault(require("axios"));
+
+var _alerts = require("./alerts");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+var stripe = Stripe("pk_test_51InSzmKdSVjalotrKGVyz3t0akT0Th5gnljVcolYRvdk5OFjZzObTHdLqG43cKJ2zI3vyREN0DP1Zf2bvZqJ1m4Q00pxb48knX");
+
+var bookTour = /*#__PURE__*/function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(tourId) {
+    var session;
+    return regeneratorRuntime.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            _context.prev = 0;
+            console.log(tourId); //we are going to get tour Id from the index.js and index from the dom
+            // 1) Get checkout session from API / endpoint
+
+            _context.next = 4;
+            return (0, _axios.default)("http://localhost:3000/api/v1/booking/checkout-session/".concat(tourId));
+
+          case 4:
+            session = _context.sent;
+            console.log(session); // 2) Create checkout form + charge credit card
+
+            _context.next = 8;
+            return stripe.redirectToCheckout({
+              sessionId: session.data.session.id
+            });
+
+          case 8:
+            _context.next = 14;
+            break;
+
+          case 10:
+            _context.prev = 10;
+            _context.t0 = _context["catch"](0);
+            console.log(_context.t0);
+            (0, _alerts.showAlert)('error', _context.t0);
+
+          case 14:
+          case "end":
+            return _context.stop();
+        }
+      }
+    }, _callee, null, [[0, 10]]);
+  }));
+
+  return function bookTour(_x) {
+    return _ref.apply(this, arguments);
+  };
+}();
+
+exports.bookTour = bookTour;
 },{"axios":"../../node_modules/axios/index.js","./alerts":"alerts.js"}],"index.js":[function(require,module,exports) {
 "use strict";
 
@@ -8980,6 +9049,8 @@ var _login = require("./login");
 
 var _updateSettings = require("./updateSettings");
 
+var _stripe = require("./stripe");
+
 /* eslint-disable */
 //DOM ELEMENTS
 var mapBox = document.getElementById('map');
@@ -8987,10 +9058,10 @@ var loginForm = document.querySelector('.form--login');
 var logOutBtn = document.querySelector('.nav__el--logout');
 var userDataForm = document.querySelector('.form-user-data');
 var userPasswordForm = document.querySelector('.form-user-password');
-console.log(userPasswordForm); // DELEGATION
-
-console.log('I am here?!');
-console.log(mapBox);
+var bookBtn = document.getElementById('book-tour'); // console.log(userPasswordForm);
+// // DELEGATION
+// console.log('I am here?!');
+// console.log(mapBox);
 
 if (mapBox) {
   // we are reading the data what we before put into the html dom
@@ -9011,13 +9082,14 @@ if (loginForm) {
 
 if (logOutBtn) logOutBtn.addEventListener('click', _login.logout);
 if (userDataForm) userDataForm.addEventListener('submit', function (e) {
-  e.preventDefault();
-  var name = document.getElementById('name').value;
-  var email = document.getElementById('email').value;
-  (0, _updateSettings.updateSettings)({
-    name: name,
-    email: email
-  }, 'data');
+  e.preventDefault(); // programmatically recrating the multiform data: enctype="multipart/form-data" anchor tag
+
+  var form = new FormData();
+  form.append('name', document.getElementById('name').value);
+  form.append('email', document.getElementById('email').value);
+  form.append('photo', document.getElementById('photo').files[0]);
+  console.log(form);
+  (0, _updateSettings.updateSettings)(form, 'data');
 });
 if (userPasswordForm) userPasswordForm.addEventListener('submit', function (e) {
   e.preventDefault();
@@ -9034,8 +9106,14 @@ if (userPasswordForm) userPasswordForm.addEventListener('submit', function (e) {
   document.getElementById('password-current').value = '';
   document.getElementById('password').value = '';
   document.getElementById('password-confirm').value = '';
+}); // payment process
+
+if (bookBtn) bookBtn.addEventListener('click', function (e) {
+  e.target.textContent = 'Processing...';
+  var tourId = e.target.dataset.tourId;
+  (0, _stripe.bookTour)(tourId);
 });
-},{"./mapbox":"mapbox.js","./login":"login.js","./updateSettings":"updateSettings.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./mapbox":"mapbox.js","./login":"login.js","./updateSettings":"updateSettings.js","./stripe":"stripe.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -9063,7 +9141,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62392" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57260" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -14,7 +14,7 @@ block content
             nav.user-view__menu
                 ul.side-nav
                     +navItem("#", "Settings", "settings", true)
-                    +navItem("#", "My bookings", "briefcase")
+                    +navItem("/my-tours", "My bookings", "briefcase")
                     +navItem("#", "My reviews", "star")
                     +navItem("#", "Billing", "card")
                 
@@ -33,6 +33,9 @@ block content
                     //- form way of sending data to API end-point
                     //- without API
                     //- form.form.form-user-data(action="/submit-user-data" method="POST")
+
+                    //- in case of sending the pictures via form
+                    //- form.form.form-user-data(action="/submit-user-data" method="POST" enctype="multipart/form-data")
                     
                     //- with API
                     form.form.form-user-data
@@ -44,7 +47,12 @@ block content
                             input#email.form__input(type='email', value=`${user.email}`, required, name="email")
                         .form__group.form__photo-upload
                             img.form__user-photo(src=`/img/users/${user.photo}`, alt='User photo')
-                            a.btn-text(href='') Choose new photo
+                            input.form__upload(type="file", accept="image/*", id="photo", name="photo") 
+                            //- we chose photo as a name because multer is waiting for it 
+                            label(for="photo") Choose new photo
+
+
+                            //- a.btn-text(href='') Choose new photo
                         .form__group.right
                             button.btn.btn--small.btn--green Save settings
                 .line &nbsp;

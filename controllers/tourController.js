@@ -1,9 +1,90 @@
+const multer = require('multer');
+const sharp = require('sharp'); // image processing library
+
 // const fs = require('fs');
 const Tour = require('../model/tourModel');
 // const APIFeatures = require('../utils/apiFeatures');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const factoryFunction = require('./handlerFactory');
+
+const multerStorage = multer.memoryStorage(); //img in buffer - faster photo processing
+
+// MULTER FILTER
+const multerFilter = (req, file, cb) => {
+  // we are going to filter only pictures
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Not an Image! Please upload only images.', 400), false);
+  }
+};
+
+//configuration of the multer uploader - without it the data in that case picture would be stored only in memory
+// const upload = multer({ dest: 'public/img/users' });
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+// from different fields
+exports.uploadTourImages = upload.fields([
+  { name: 'imageCover', maxCount: 1 },
+  { name: 'images', maxCount: 3 },
+]);
+
+// when there is one field with many pictures and the same name ----- req.files
+// upload.array("images", 5)
+// when there is single image ------- req.file
+// upload.single('image');
+
+exports.resizeTourImages = catchAsync(async (req, res, next) => {
+  // console.log(req.files);
+  if (!req.files.imageCover || !req.files.images) return next();
+  // 1) Cover images
+  // we are updating tur via entire body object on req and schema definition
+  req.body.imageCover = `tour=${req.params.id}-${Date.now()}-cover.jpeg`;
+  await sharp(req.files.imageCover[0].buffer)
+    .resize(2000, 1333)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 }) //default it is going work like crop
+    .toFile(`public/img/tours/${req.body.imageCover}`);
+
+  // 2 ) cover images array
+  req.body.images = [];
+
+  //IMPORTANT
+  //wrong async solution, because inner function is async but forEach() is not, so code is not going
+  // to await forEach() it just going to jump to next leaving the req.body.images() as a empty array
+  // req.files.images.forEach(async (file, i) => {
+  //   const filename = `tour=${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+
+  //   await sharp(req.files.imageCover[0].buffer)
+  //     .resize(2000, 1333)
+  //     .toFormat('jpeg')
+  //     .jpeg({ quality: 90 }) //default it is going work like crop
+  //     .toFile(`public/img/tours/${filename}`);
+
+  //   req.body.images.push(filename);
+  // });
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  // We are using map() to return the array of promisees and then we are going to await it by await Promise.all()
+  await Promise.all(
+    req.files.images.map(async (file, i) => {
+      const filename = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+
+      await sharp(file.buffer)
+        .resize(2000, 1333)
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 }) //default it is going work like crop
+        .toFile(`public/img/tours/${filename}`);
+
+      req.body.images.push(filename);
+    })
+  );
+  // console.log(req.body);
+  next();
+});
 
 //our middleware modifying the req.query
 exports.aliasTopTours = (req, res, next) => {

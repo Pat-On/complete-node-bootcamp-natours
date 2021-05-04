@@ -1,7 +1,9 @@
 /* eslint-disable */
+
 import { displayMap } from './mapbox';
 import { login, logout } from './login';
 import { updateSettings } from './updateSettings';
+import { bookTour } from './stripe';
 
 //DOM ELEMENTS
 const mapBox = document.getElementById('map');
@@ -9,10 +11,12 @@ const loginForm = document.querySelector('.form--login');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
-console.log(userPasswordForm);
-// DELEGATION
-console.log('I am here?!');
-console.log(mapBox);
+const bookBtn = document.getElementById('book-tour');
+
+// console.log(userPasswordForm);
+// // DELEGATION
+// console.log('I am here?!');
+// console.log(mapBox);
 if (mapBox) {
   // we are reading the data what we before put into the html dom
   const locations = JSON.parse(mapBox.dataset.locations);
@@ -36,11 +40,15 @@ if (logOutBtn) logOutBtn.addEventListener('click', logout);
 if (userDataForm)
   userDataForm.addEventListener('submit', (e) => {
     e.preventDefault();
+    // programmatically recrating the multiform data: enctype="multipart/form-data" anchor tag
+    const form = new FormData();
+    form.append('name', document.getElementById('name').value);
+    form.append('email', document.getElementById('email').value);
+    form.append('photo', document.getElementById('photo').files[0]);
 
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
+    console.log(form);
 
-    updateSettings({ name, email }, 'data');
+    updateSettings(form, 'data');
   });
 
 if (userPasswordForm)
@@ -57,4 +65,12 @@ if (userPasswordForm)
     document.getElementById('password-current').value = '';
     document.getElementById('password').value = '';
     document.getElementById('password-confirm').value = '';
+  });
+
+// payment process
+if (bookBtn)
+  bookBtn.addEventListener('click', (e) => {
+    e.target.textContent = 'Processing...';
+    const tourId = e.target.dataset.tourId;
+    bookTour(tourId);
   });
