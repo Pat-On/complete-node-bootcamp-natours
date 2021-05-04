@@ -35,6 +35,7 @@ router.patch(
   '/updateMe',
   // multer middleware
   userController.UploadUserPhoto,
+  userController.resizeUserPhoto,
   // upload.single('photo'),
   // authController.protect,
   userController.updateMe
