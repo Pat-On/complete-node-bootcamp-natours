@@ -7,7 +7,7 @@ const { fromString } = require('html-to-text');
 
 module.exports = class Email {
   constructor(user, url) {
-    this.to = user;
+    this.to = user.email;
     this.firstName = user.name.split(' ')[0];
     this.url = url;
     this.from = `Patryk <${process.env.EMAIL_FROM}>`;
@@ -16,10 +16,16 @@ module.exports = class Email {
   // it make very easy to make different transports for different needs / abstracting logic
   newTransport() {
     if (process.env.NODE_ENV === 'production') {
-      //Sendgrid
-
-      return 1;
+      // Sendgrid
+      return nodemailer.createTransport({
+        service: 'SendGrid',
+        auth: {
+          user: process.env.SENDGRID_USERNAME,
+          pass: process.env.SENDGRID_PASSWORD,
+        },
+      });
     }
+
     return nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
       port: process.env.EMAIL_PORT,
@@ -61,6 +67,7 @@ module.exports = class Email {
   async sendWelcome() {
     await this.send('Welcome', 'Welcome to the Natours Family!');
   }
+
   async sendPasswordReset() {
     await this.send(
       'passwordReset',
