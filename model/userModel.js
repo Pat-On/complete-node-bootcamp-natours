@@ -18,7 +18,10 @@ const userSchema = new mongoose.Schema({
     lowercase: true, //it is not validator, it is just going to convert the email to it
     validate: [validator.isEmail, 'Please provide a valid email'], // <-documentation
   },
-  photo: String, // photo in most web app is optional
+  photo: {
+    type: String,
+    default: 'default.jpg',
+  }, // photo in most web app is optional
   role: {
     type: String,
     enum: ['user', 'guide', 'lead-guide', 'admin'],
@@ -98,8 +101,8 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
       10
     );
 
-    console.log(changedTimestamp, JWTTimestamp);
-    console.log(changedTimestamp < JWTTimestamp);
+    // console.log(changedTimestamp, JWTTimestamp);
+    // console.log(changedTimestamp < JWTTimestamp);
     return JWTTimestamp < changedTimestamp;
   }
 
