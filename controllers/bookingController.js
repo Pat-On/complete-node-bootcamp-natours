@@ -3,11 +3,11 @@ const Tour = require('../model/tourModel');
 const Booking = require('../model/bookingModel');
 // const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
-// const factoryFunction = require('./handlerFactory');
+const factoryFunction = require('./handlerFactory');
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // 1) get the currently booked tour
-  console.log('<getcheckoutsession>' + req.params.tourId);
+  // console.log('<getcheckoutsession>' + req.params.tourId);
   const tour = await Tour.findById(req.params.tourId);
   // 2) create checkout session
   //this is async because it is going to call many api req to stripe
@@ -56,3 +56,9 @@ exports.createBookingCheckout = catchAsync(async (req, res, next) => {
   // it is creating another request to route and we will re-hit that middleware but without query strings
   res.redirect(req.originalUrl.split('?')[0]);
 });
+
+exports.createBooking = factoryFunction.createOne(Booking);
+exports.getBooking = factoryFunction.getOne(Booking);
+exports.getAllBookings = factoryFunction.getAll(Booking);
+exports.updateBooking = factoryFunction.updateOne(Booking);
+exports.deleteBooking = factoryFunction.deleteOne(Booking);
