@@ -1,4 +1,5 @@
 const express = require('express');
+
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
 
@@ -32,6 +33,9 @@ router.get(
 );
 router.patch(
   '/updateMe',
+  // multer middleware
+  userController.UploadUserPhoto,
+  // upload.single('photo'),
   // authController.protect,
   userController.updateMe
 );

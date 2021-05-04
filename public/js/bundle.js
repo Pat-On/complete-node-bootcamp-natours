@@ -8940,29 +8940,29 @@ var updateSettings = /*#__PURE__*/function () {
 
           case 4:
             _res = _context.sent;
-            console.log(_res);
 
+            // console.log(res);
             if (_res.data.status === 'success') {
               // we defined that status in our response
               (0, _alerts.showAlert)('success', "".concat(type.toUpperCase(), " updated successfully!"));
             }
 
-            _context.next = 14;
+            _context.next = 13;
             break;
 
-          case 9:
-            _context.prev = 9;
+          case 8:
+            _context.prev = 8;
             _context.t0 = _context["catch"](0);
             console.log(res);
             console.log(data);
             (0, _alerts.showAlert)('error', _context.t0.response.data.message);
 
-          case 14:
+          case 13:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 9]]);
+    }, _callee, null, [[0, 8]]);
   }));
 
   return function updateSettings(_x, _x2) {
@@ -9063,7 +9063,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62392" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59463" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

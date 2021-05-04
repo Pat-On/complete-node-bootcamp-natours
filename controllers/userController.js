@@ -1,8 +1,42 @@
+const multer = require('multer');
+
 const User = require('../model/userModel');
 // const APIFeatures = require('../utils/apiFeatures');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const factoryFunction = require('./handlerFactory');
+
+//MULTER STORAGE
+const multerStorage = multer.diskStorage({
+  // cv is similar to next but it is not part of the express
+  destination: (req, file, cb) => {
+    cb(null, 'public/img/users');
+  },
+  filename: (req, file, cb) => {
+    //user-ID-time-stamp.jpeg
+    const ext = file.mimetype.split('/')[1];
+    cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
+  },
+});
+
+// MULTER FILTER
+const multerFilter = (req, file, cb) => {
+  // we are going to filter only pictures
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Not an Image! Please upload only images.', 400), false);
+  }
+};
+
+//configuration of the multer uploader - without it the data in that case picture would be stored only in memory
+// const upload = multer({ dest: 'public/img/users' });
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+exports.UploadUserPhoto = upload.single('photo');
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -33,6 +67,9 @@ exports.getAllUsers = factoryFunction.getAll(User);
 // });
 
 exports.updateMe = catchAsync(async (req, res, next) => {
+  console.log('did you get hre?');
+  console.log(req.file);
+  console.log(req.body);
   // 1)  create error if user POSTs password data
   if (req.body.password || req.body.passwordConfirm) {
     return next(
