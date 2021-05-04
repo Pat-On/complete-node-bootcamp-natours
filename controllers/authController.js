@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../model/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-const sendEmail = require('../utils/email');
+const Email = require('../utils/email');
 
 // console.log(process.env.JWT_EXPIRES_IN);
 const signToken = (id) =>
@@ -59,7 +59,9 @@ exports.signup = catchAsync(async (req, res, next) => {
     // passwordChangedAt: req.body.passwordConfirm, BUG WRRR! silly mistake quickly found!
     role: req.body.role,
   });
-
+  const url = `${req.protocol}://${req.get('host')}/me`;
+  console.log(url);
+  await new Email(newUser, url).sendWelcome();
   // const token = signToken(newUser._id);
 
   // const token = jwt.sign(
@@ -261,11 +263,11 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   //like extension to the global middleware error handler!
   try {
     //sending email
-    await sendEmail({
-      email: user.email,
-      subject: 'Your password reset token (valid for 10min)',
-      message: message,
-    });
+    // await sendEmail({
+    //   email: user.email,
+    //   subject: 'Your password reset token (valid for 10min)',
+    //   message: message,
+    // });
 
     res.status(200).json({
       status: 'success',

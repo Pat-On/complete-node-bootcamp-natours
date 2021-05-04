@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 
 const pug = require('pug');
 
-const htmlToText = require('html-to-text');
+const { fromString } = require('html-to-text');
 // new Email(user, url).sendWelcome();   .sendPasswordReset
 
 module.exports = class Email {
@@ -13,7 +13,7 @@ module.exports = class Email {
     this.from = `Patryk <${process.env.EMAIL_FROM}>`;
   }
 
-  // it make very easy to make different transports for different needs
+  // it make very easy to make different transports for different needs / abstracting logic
   newTransport() {
     if (process.env.NODE_ENV === 'production') {
       //Sendgrid
@@ -49,7 +49,7 @@ module.exports = class Email {
       from: this.from,
       to: this.to,
       subject: subject,
-      test: htmlToText.fromString(html),
+      text: fromString(html),
       html,
     };
 
