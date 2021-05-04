@@ -9,7 +9,7 @@ const router = express.Router();
 // this API is going to be only to checkout session for user
 
 router.get(
-  '/checkout-session/:tourID',
+  '/checkout-session/:tourId',
   authController.protect,
   bookingController.getCheckoutSession
 );
