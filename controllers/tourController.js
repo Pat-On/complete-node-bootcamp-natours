@@ -67,11 +67,11 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
 
   //   req.body.images.push(filename);
   // });
-
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   // We are using map() to return the array of promisees and then we are going to await it by await Promise.all()
   await Promise.all(
     req.files.images.map(async (file, i) => {
-      const filename = `tour=${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+      const filename = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
 
       await sharp(file.buffer)
         .resize(2000, 1333)
@@ -82,7 +82,7 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
       req.body.images.push(filename);
     })
   );
-  console.log(req.body);
+  // console.log(req.body);
   next();
 });
 
