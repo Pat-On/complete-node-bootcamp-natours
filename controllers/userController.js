@@ -7,7 +7,7 @@ const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const factoryFunction = require('./handlerFactory');
 
-//MULTER STORAGE
+//MULTER STORAGE - saving without img processing straight to hdd
 // const multerStorage = multer.diskStorage({
 //   // cv is similar to next but it is not part of the express
 //   destination: (req, file, cb) => {
@@ -19,7 +19,8 @@ const factoryFunction = require('./handlerFactory');
 //     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
 //   },
 // });
-const multerStorage = multer.memoryStorage(); //img in buffer
+
+const multerStorage = multer.memoryStorage(); //img in buffer - faster photo processing
 
 // MULTER FILTER
 const multerFilter = (req, file, cb) => {

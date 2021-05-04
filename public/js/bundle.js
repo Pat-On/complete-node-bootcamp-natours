@@ -8923,8 +8923,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 var updateSettings = /*#__PURE__*/function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(data, type) {
-    var url, _res;
-
+    var url, res;
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
@@ -8939,30 +8938,33 @@ var updateSettings = /*#__PURE__*/function () {
             });
 
           case 4:
-            _res = _context.sent;
+            res = _context.sent;
+            console.log(url);
+            console.log(data);
+            console.log(res.data.status);
+            console.log(res); // console.log(res);
 
-            // console.log(res);
-            if (_res.data.status === 'success') {
+            if (res.data.status === 'success') {
               // we defined that status in our response
               (0, _alerts.showAlert)('success', "".concat(type.toUpperCase(), " updated successfully!"));
             }
 
-            _context.next = 13;
+            _context.next = 17;
             break;
 
-          case 8:
-            _context.prev = 8;
+          case 12:
+            _context.prev = 12;
             _context.t0 = _context["catch"](0);
-            console.log(res);
+            console.log(_context.t0.response.data.message);
             console.log(data);
             (0, _alerts.showAlert)('error', _context.t0.response.data.message);
 
-          case 13:
+          case 17:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 8]]);
+    }, _callee, null, [[0, 12]]);
   }));
 
   return function updateSettings(_x, _x2) {
@@ -9011,13 +9013,14 @@ if (loginForm) {
 
 if (logOutBtn) logOutBtn.addEventListener('click', _login.logout);
 if (userDataForm) userDataForm.addEventListener('submit', function (e) {
-  e.preventDefault();
-  var name = document.getElementById('name').value;
-  var email = document.getElementById('email').value;
-  (0, _updateSettings.updateSettings)({
-    name: name,
-    email: email
-  }, 'data');
+  e.preventDefault(); // programmatically recrating the multiform data: enctype="multipart/form-data" anchor tag
+
+  var form = new FormData();
+  form.append('name', document.getElementById('name').value);
+  form.append('email', document.getElementById('email').value);
+  form.append('photo', document.getElementById('photo').files[0]);
+  console.log(form);
+  (0, _updateSettings.updateSettings)(form, 'data');
 });
 if (userPasswordForm) userPasswordForm.addEventListener('submit', function (e) {
   e.preventDefault();
@@ -9063,7 +9066,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59463" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50909" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
