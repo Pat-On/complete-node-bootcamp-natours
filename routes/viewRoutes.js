@@ -1,7 +1,7 @@
 const express = require('express');
 const viewsController = require('../controllers/viewsController');
 const authController = require('../controllers/authController');
-
+const bookingController = require('../controllers/bookingController');
 const router = express.Router();
 
 //PUG road - way of passing data to pug template
@@ -17,7 +17,12 @@ const router = express.Router();
 //middleware which is going to be apply to everysingle road
 // router.use(authController.isLoggedIn);
 
-router.get('/', authController.isLoggedIn, viewsController.getOverview);
+router.get(
+  '/',
+  bookingController.createBookingCheckout, // temporary solution totally not secure
+  authController.isLoggedIn,
+  viewsController.getOverview
+);
 
 router.get('/tour/:slug', authController.isLoggedIn, viewsController.getTour);
 
