@@ -1,5 +1,5 @@
 const multer = require('multer');
-// const sharp = require('sharp'); // image processing library
+const sharp = require('sharp'); // image processing library
 
 // const fs = require('fs');
 const Tour = require('../model/tourModel');
@@ -38,10 +38,53 @@ exports.uploadTourImages = upload.fields([
 // when there is single image ------- req.file
 // upload.single('image');
 
-exports.resizeTourImages = (req, res, next) => {
-  console.log(req.files);
+exports.resizeTourImages = catchAsync(async (req, res, next) => {
+  // console.log(req.files);
+  if (!req.files.imageCover || !req.files.images) return next();
+  // 1) Cover images
+  // we are updating tur via entire body object on req and schema definition
+  req.body.imageCover = `tour=${req.params.id}-${Date.now()}-cover.jpeg`;
+  await sharp(req.files.imageCover[0].buffer)
+    .resize(2000, 1333)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 }) //default it is going work like crop
+    .toFile(`public/img/tours/${req.body.imageCover}`);
+
+  // 2 ) cover images array
+  req.body.images = [];
+
+  //IMPORTANT
+  //wrong async solution, because inner function is async but forEach() is not, so code is not going
+  // to await forEach() it just going to jump to next leaving the req.body.images() as a empty array
+  // req.files.images.forEach(async (file, i) => {
+  //   const filename = `tour=${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+
+  //   await sharp(req.files.imageCover[0].buffer)
+  //     .resize(2000, 1333)
+  //     .toFormat('jpeg')
+  //     .jpeg({ quality: 90 }) //default it is going work like crop
+  //     .toFile(`public/img/tours/${filename}`);
+
+  //   req.body.images.push(filename);
+  // });
+
+  // We are using map() to return the array of promisees and then we are going to await it by await Promise.all()
+  await Promise.all(
+    req.files.images.map(async (file, i) => {
+      const filename = `tour=${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+
+      await sharp(file.buffer)
+        .resize(2000, 1333)
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 }) //default it is going work like crop
+        .toFile(`public/img/tours/${filename}`);
+
+      req.body.images.push(filename);
+    })
+  );
+  console.log(req.body);
   next();
-};
+});
 
 //our middleware modifying the req.query
 exports.aliasTopTours = (req, res, next) => {
