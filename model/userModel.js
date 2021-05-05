@@ -101,8 +101,6 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
       10
     );
 
-    // console.log(changedTimestamp, JWTTimestamp);
-    // console.log(changedTimestamp < JWTTimestamp);
     return JWTTimestamp < changedTimestamp;
   }
 
@@ -119,7 +117,6 @@ userSchema.methods.createPasswordResetToken = function () {
     .createHash('sha256')
     .update(resetToken)
     .digest('hex');
-  console.log({ resetToken }, this.passwordResetToken);
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
   return resetToken; //via email we are sending not encrypted version but in DB we store encrypted one!

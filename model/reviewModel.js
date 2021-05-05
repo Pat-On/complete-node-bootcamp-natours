@@ -57,7 +57,6 @@ reviewSchema.pre(/^find/, function (next) {
 
 //static method NICE SOLUTION - static method is accessible on the model
 reviewSchema.statics.calcAverageRatings = async function (tourId) {
-  // console.log(tourId);
   const stats = await this.aggregate([
     { $match: { tour: tourId } },
     // if there is no match we are going to have error in Tour.findByIdAndUpdate
@@ -69,7 +68,7 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
       },
     },
   ]);
-  // console.log(stats);
+
   // updating the tour results - savings statistic to the current tour
 
   if (stats.length > 0) {
@@ -98,11 +97,7 @@ reviewSchema.post('save', function () {
 // we can not change here for post because query is already executed
 reviewSchema.pre(/^findOneAnd/, async function (next) {
   this.r = await this.findOne(); //here is still old review object, before update
-  // console.log(this.r);
-  // console.log(
-  //   '*************************************************************************'
-  // );
-  // console.log(this);
+
   next();
 });
 
@@ -110,7 +105,7 @@ reviewSchema.post(/^findOneAnd/, async function () {
   // this.findOne(); does NOT work here, query has already executed
 
   // here is best time to call the static unction because the object was already ipdated
-  // console.log(`<here>${this.r}`);
+
   await this.r.constructor.calcAverageRatings(this.r.tour);
 });
 

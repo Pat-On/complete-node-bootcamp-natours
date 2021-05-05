@@ -39,7 +39,6 @@ exports.uploadTourImages = upload.fields([
 // upload.single('image');
 
 exports.resizeTourImages = catchAsync(async (req, res, next) => {
-  // console.log(req.files);
   if (!req.files.imageCover || !req.files.images) return next();
   // 1) Cover images
   // we are updating tur via entire body object on req and schema definition
@@ -82,7 +81,7 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
       req.body.images.push(filename);
     })
   );
-  // console.log(req.body);
+
   next();
 });
 
@@ -370,7 +369,6 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
   const tours = await Tour.find({
     startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
   });
-  console.log(distance, latlng, unit, lat, lng);
 
   res.status(200).json({
     results: tours.length,
@@ -379,7 +377,6 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
 });
 
 exports.getDistances = catchAsync(async (req, res, next) => {
-  console.log('???');
   const { latlng, unit } = req.params;
 
   const [lat, lng] = latlng.split(',');

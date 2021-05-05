@@ -13,12 +13,10 @@ const handleDuplicateFieldsDB = (err) => {
 
   //OLD CODE WHAT WE ARE NOT GETTING ANYMORE OUTDATED
   // const value = err.errmsg.match(/(["'])(\\?.)*?\1/);
-  // console.log(value);
   // const message = `Duplicate field value: {} Please use another value!`;
 };
 
 const handleValidationErrorDB = (err) => {
-  console.log('Did You get here?');
   const errors = Object.values(err.errors).map((item) => item.message);
   const message = `Invalid input data. ${errors.join('. ')}`;
   return new AppError(message, 400);
@@ -90,7 +88,6 @@ const sendErrorProduction = (err, req, res) => {
 
 module.exports = (err, req, res, next) => {
   //printing error stack trace
-  //   console.log(err.stack);
   //we are going to give default status code because we may have error
   err.statusCode = err.statusCode || 500;
   //the same like above
@@ -102,7 +99,6 @@ module.exports = (err, req, res, next) => {
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
     error.message = err.message;
-    console.log(err.stack);
 
     //targeting the operational error which are coming from imported modules
     if (error.name === 'CastError') {

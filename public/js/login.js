@@ -5,8 +5,6 @@ import { showAlert } from './alerts';
 import '@babel/polyfill';
 
 export const login = async (email, password) => {
-  console.log(password);
-  console.log(email);
   try {
     const res = await axios({
       method: 'POST',
@@ -23,7 +21,6 @@ export const login = async (email, password) => {
         location.assign('/');
       }, 1500);
     }
-    console.log(res);
   } catch (err) {
     showAlert('error', err.response.data.message);
   }
@@ -36,7 +33,7 @@ export const logout = async () => {
       url: 'http://localhost:3000/api/v1/users/logout',
     });
     // if (res.data.status === 'success') location.reload(); // old
-    // console.log(document.URL);
+
     if (res.data.status === 'success') window.location.href = '/'; // IS it good solution?
   } catch (err) {
     showAlert('error', 'Error logging out! Try again');

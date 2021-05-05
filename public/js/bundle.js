@@ -8814,10 +8814,8 @@ var login = /*#__PURE__*/function () {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            console.log(password);
-            console.log(email);
-            _context.prev = 2;
-            _context.next = 5;
+            _context.prev = 0;
+            _context.next = 3;
             return (0, _axios.default)({
               method: 'POST',
               url: 'http://localhost:3000/api/v1/users/login',
@@ -8827,7 +8825,7 @@ var login = /*#__PURE__*/function () {
               }
             });
 
-          case 5:
+          case 3:
             res = _context.sent;
 
             if (res.data.status === 'success') {
@@ -8837,21 +8835,20 @@ var login = /*#__PURE__*/function () {
               }, 1500);
             }
 
-            console.log(res);
-            _context.next = 13;
+            _context.next = 10;
             break;
 
-          case 10:
-            _context.prev = 10;
-            _context.t0 = _context["catch"](2);
+          case 7:
+            _context.prev = 7;
+            _context.t0 = _context["catch"](0);
             (0, _alerts.showAlert)('error', _context.t0.response.data.message);
 
-          case 13:
+          case 10:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[2, 10]]);
+    }, _callee, null, [[0, 7]]);
   }));
 
   return function login(_x, _x2) {
@@ -8878,7 +8875,6 @@ var logout = /*#__PURE__*/function () {
           case 3:
             res = _context2.sent;
             // if (res.data.status === 'success') location.reload(); // old
-            // console.log(document.URL);
             if (res.data.status === 'success') window.location.href = '/'; // IS it good solution?
 
             _context2.next = 10;
@@ -8939,32 +8935,26 @@ var updateSettings = /*#__PURE__*/function () {
 
           case 4:
             res = _context.sent;
-            console.log(url);
-            console.log(data);
-            console.log(res.data.status);
-            console.log(res); // console.log(res);
 
             if (res.data.status === 'success') {
               // we defined that status in our response
               (0, _alerts.showAlert)('success', "".concat(type.toUpperCase(), " updated successfully!"));
             }
 
-            _context.next = 17;
+            _context.next = 11;
             break;
 
-          case 12:
-            _context.prev = 12;
+          case 8:
+            _context.prev = 8;
             _context.t0 = _context["catch"](0);
-            console.log(_context.t0.response.data.message);
-            console.log(data);
             (0, _alerts.showAlert)('error', _context.t0.response.data.message);
 
-          case 17:
+          case 11:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 12]]);
+    }, _callee, null, [[0, 8]]);
   }));
 
   return function updateSettings(_x, _x2) {
@@ -9001,37 +8991,32 @@ var bookTour = /*#__PURE__*/function () {
         switch (_context.prev = _context.next) {
           case 0:
             _context.prev = 0;
-            console.log(tourId); //we are going to get tour Id from the index.js and index from the dom
-            // 1) Get checkout session from API / endpoint
-
-            _context.next = 4;
+            _context.next = 3;
             return (0, _axios.default)("http://localhost:3000/api/v1/booking/checkout-session/".concat(tourId));
 
-          case 4:
+          case 3:
             session = _context.sent;
-            console.log(session); // 2) Create checkout form + charge credit card
-
-            _context.next = 8;
+            _context.next = 6;
             return stripe.redirectToCheckout({
               sessionId: session.data.session.id
             });
 
-          case 8:
-            _context.next = 14;
+          case 6:
+            _context.next = 12;
             break;
 
-          case 10:
-            _context.prev = 10;
+          case 8:
+            _context.prev = 8;
             _context.t0 = _context["catch"](0);
             console.log(_context.t0);
             (0, _alerts.showAlert)('error', _context.t0);
 
-          case 14:
+          case 12:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 10]]);
+    }, _callee, null, [[0, 8]]);
   }));
 
   return function bookTour(_x) {
@@ -9058,10 +9043,7 @@ var loginForm = document.querySelector('.form--login');
 var logOutBtn = document.querySelector('.nav__el--logout');
 var userDataForm = document.querySelector('.form-user-data');
 var userPasswordForm = document.querySelector('.form-user-password');
-var bookBtn = document.getElementById('book-tour'); // console.log(userPasswordForm);
-// // DELEGATION
-// console.log('I am here?!');
-// console.log(mapBox);
+var bookBtn = document.getElementById('book-tour'); // // DELEGATION
 
 if (mapBox) {
   // we are reading the data what we before put into the html dom
@@ -9088,7 +9070,6 @@ if (userDataForm) userDataForm.addEventListener('submit', function (e) {
   form.append('name', document.getElementById('name').value);
   form.append('email', document.getElementById('email').value);
   form.append('photo', document.getElementById('photo').files[0]);
-  console.log(form);
   (0, _updateSettings.updateSettings)(form, 'data');
 });
 if (userPasswordForm) userPasswordForm.addEventListener('submit', function (e) {
@@ -9141,7 +9122,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57260" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53984" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

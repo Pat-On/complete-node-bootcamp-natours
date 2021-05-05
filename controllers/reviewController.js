@@ -28,7 +28,7 @@ exports.setTourUserIds = (req, res, next) => {
 
 // exports.createReview = catchAsync(async (req, res, next) => {
 //   //allow nested routes
-//   // console.log(req.params.tourId);
+//   // (req.params.tourId);
 
 //   const newReview = await Review.create(req.body); //if something is not existing in schema it would be lost
 

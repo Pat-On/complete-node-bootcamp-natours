@@ -158,13 +158,12 @@ tourSchema.virtual('reviews', {
 
 // DOCUMENT MIDDLEWARE: runs before .save() and .create() but .insertMany() is not going trigger it
 tourSchema.pre('save', function (next) {
-  // console.log(this); //this is going to be our document
   this.slug = slugify(this.name, { lower: true });
   next();
 });
 //after saving document to DB - last middleware after all changes
 // tourSchema.post('save', function (doc, next) {
-//   console.log(doc);
+
 //   next();
 // });
 
@@ -188,8 +187,6 @@ tourSchema.pre(/^find/, function (next) {
 
 //run after query was executed so we have access to the docs
 // tourSchema.post(/^find/, function (docs, next) {
-// console.log(`query took: ${Date.now() - this.start} milliseconds`);
-// console.log(docs);
 
 // next();
 // });
@@ -197,7 +194,6 @@ tourSchema.pre(/^find/, function (next) {
 //All queries by this query middleware will populate the guides fields
 // it is going to happen everywhere on the find methods
 tourSchema.pre(/^find/, function (next) {
-  console.log('Populate guides');
   this.populate({
     path: 'guides',
     select: '-__v -passwordChangedAt',
@@ -211,7 +207,6 @@ tourSchema.pre(/^find/, function (next) {
 // tourSchema.pre('aggregate', function (next) {
 //   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
 
-//   console.log(this.pipeline());
 //   next();
 // });
 

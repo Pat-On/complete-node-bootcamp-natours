@@ -13,10 +13,8 @@ const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 const bookBtn = document.getElementById('book-tour');
 
-// console.log(userPasswordForm);
 // // DELEGATION
-// console.log('I am here?!');
-// console.log(mapBox);
+
 if (mapBox) {
   // we are reading the data what we before put into the html dom
   const locations = JSON.parse(mapBox.dataset.locations);
@@ -45,8 +43,6 @@ if (userDataForm)
     form.append('name', document.getElementById('name').value);
     form.append('email', document.getElementById('email').value);
     form.append('photo', document.getElementById('photo').files[0]);
-
-    console.log(form);
 
     updateSettings(form, 'data');
   });
