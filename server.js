@@ -47,3 +47,10 @@ process.on('unhandledRejection', (err) => {
 
 ///here at this place we would have the software which is going to start up again the application
 //dev ops?
+
+process.on('SIGTERM', () => {
+  console.log('SIGTERM RECEIVED. Shotting down gracefully');
+  server.close(() => {
+    console.log('Process terminated!');
+  });
+});
