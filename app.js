@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cors = require('cors');
 
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
@@ -31,6 +32,22 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 //1) MIDDLEWARE GLOBAL
+//implement CORS
+// Access-Control-Allow-Origin *
+// it work for simple requests - GET and POST
+
+app.use(cors());
+
+// allowing cors for specific request
+// app.use(
+//   cors({
+//     origin: 'http://www.natours.com',
+//   })
+// );
+
+// allowing others type  requests for preflight phase
+app.options('*', cors());
+
 //SET SECURITY HTTP HEADERS
 // app.use(helmet());
 
