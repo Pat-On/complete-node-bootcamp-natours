@@ -12,19 +12,30 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
-const createSendToken = (user, statusCode, res) => {
+const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user.id);
 
-  const cookieOptions = {
+  // const cookieOptions = {
+  //   expires: new Date(
+  //     Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+  //   ), //expiration
+
+  //   httpOnly: true, //not allowed modification on browser
+  //   secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+  // };
+  // if (process.env.NODE_ENV === 'production') cookieOptions.secure = true; //send only on https ss
+
+  //heroku way of setting https
+  // if (req.secure || req.headers['x-forwarded-proto'] === 'https')
+
+  res.cookie('jwt', token, {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ), //expiration
 
     httpOnly: true, //not allowed modification on browser
-  };
-  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true; //send only on https ss
-
-  res.cookie('jwt', token, cookieOptions);
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+  });
 
   //remove password from the output
   user.password = undefined;
@@ -71,7 +82,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   //   { expiresIn: process.env.JWT_EXPIRES_IN } // expiration time
   // );
 
-  createSendToken(newUser, 201, res);
+  createSendToken(newUser, 201, req, res);
 
   // // here we are not going to check anything because the user is created and we are going to send the token
   // res.status(201).json({
@@ -106,7 +117,7 @@ exports.login = catchAsync(async (req, res, next) => {
 
   //3) If everything ok, send token to client
 
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 
   // const token = signToken(user._id);
   // res.status(200).json({
@@ -310,7 +321,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   //4 log the user in, send JWT
 
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 
   // const token = signToken(user._id);
 
@@ -335,7 +346,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   await user.save(); // we want validation to happen
   // 4) log user in, send JWT
 
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 
   //User.findByIDAndUpdate -> we can not use it because: validation is not going to work!  because mongo is not keeping curren object in memory so this.something would not work
   // and pre('save') middlewares are not going to work and the password is not going to be encrypted
