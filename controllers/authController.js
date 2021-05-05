@@ -7,7 +7,6 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const Email = require('../utils/email');
 
-// console.log(process.env.JWT_EXPIRES_IN);
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -60,7 +59,6 @@ exports.signup = catchAsync(async (req, res, next) => {
     role: req.body.role,
   });
   const url = `${req.protocol}://${req.get('host')}/me`;
-  console.log(url);
   await new Email(newUser, url).sendWelcome();
   // const token = signToken(newUser._id);
 
@@ -75,7 +73,6 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   createSendToken(newUser, 201, res);
 
-  // console.log(newUser);
   // // here we are not going to check anything because the user is created and we are going to send the token
   // res.status(201).json({
   //   status: 'success',
@@ -98,7 +95,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
   //2) check if user exists && password is correct
   const user = await User.findOne({ email: email }).select('+password'); // adding password field to return
-  console.log(user);
+
   // const correct = await user.correctPassword(password, user.password);
 
   // or statement if user does not exist it will not even run right side
@@ -143,9 +140,6 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   if (!token) {
-    // console.log(token);
-    // console.log('Did you get here???????????');
-    console.log('Did you get here????');
     return next(
       new AppError('You are not logged in! Please log in to get access.', 401)
     );
@@ -155,8 +149,6 @@ exports.protect = catchAsync(async (req, res, next) => {
   // verification process if nt successful will throw error :> altering etc
   // MOST important PART
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-  // console.log(decoded);
-  // console.log('Did you get here?');
 
   //3)  check if user still exists
   const currentUser = await User.findById(decoded.id);
@@ -170,7 +162,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
   //4) check if user changes password (token) after the JWT was issued
   //documents are instances of the model
-  console.log(decoded);
+
   if (currentUser.changedPasswordAfter(decoded.iat)) {
     return next(
       new AppError('User recently changed password! Please log in again!', 401)
@@ -221,7 +213,6 @@ exports.isLoggedIn = async (req, res, next) => {
         expires: new Date(Date.now() - 10 * 1000),
         httpOnly: true,
       });
-      // console.log(error);
       return next();
     }
   }

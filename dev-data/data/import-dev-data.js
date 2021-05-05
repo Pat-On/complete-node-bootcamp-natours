@@ -24,7 +24,6 @@ mongoose
   })
   .then(() => {
     // here we have access to the connection object
-    // console.log(con.connections);
     console.log('DB connection successful!');
   });
 

@@ -7,7 +7,6 @@ const factoryFunction = require('./handlerFactory');
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // 1) get the currently booked tour
-  // console.log('<getcheckoutsession>' + req.params.tourId);
   const tour = await Tour.findById(req.params.tourId);
   // 2) create checkout session
   //this is async because it is going to call many api req to stripe

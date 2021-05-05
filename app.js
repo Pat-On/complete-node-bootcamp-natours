@@ -7,7 +7,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 
 const cookieParser = require('cookie-parser');
-
+const compression = require('compression');
 const path = require('path');
 
 const AppError = require('./utils/appError');
@@ -27,7 +27,6 @@ app.set('views', path.join(__dirname, 'views'));
 // app.use(express.static(`${__dirname}/public`));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// console.log(process.env.NODE_ENV);
 //1) MIDDLEWARE GLOBAL
 //SET SECURITY HTTP HEADERS
 // app.use(helmet());
@@ -128,11 +127,12 @@ app.use(
   })
 );
 
+app.use(compression()); // it is going to compress entire text sent to client
+
 // Test middleware
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
-  // console.log(req.headers);
-  // console.log(req.cookies);
+
   next();
 });
 
