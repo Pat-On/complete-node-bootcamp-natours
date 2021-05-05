@@ -10,9 +10,7 @@ export const bookTour = async (tourId) => {
   try {
     //we are going to get tour Id from the index.js and index from the dom
     // 1) Get checkout session from API / endpoint
-    const session = await axios(
-      `http://localhost:3000/api/v1/booking/checkout-session/${tourId}`
-    );
+    const session = await axios(`/api/v1/booking/checkout-session/${tourId}`);
 
     // 2) Create checkout form + charge credit card
     await stripe.redirectToCheckout({
